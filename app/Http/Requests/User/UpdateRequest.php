@@ -31,7 +31,7 @@ class UpdateRequest extends FormRequest
             'apellido' => 'required|max:50',
             'direccion' => 'required|max:75',
             'sexo' => 'required',
-            'foto_perfil' => 'image|dimensions:min_width=128,min_height=128',
+            '_foto_perfil' => 'image|dimensions:min_width=128,min_height=128',
         ];
     }
 
@@ -56,8 +56,8 @@ class UpdateRequest extends FormRequest
 
             'sexo.required' => 'Este campo es requerido',
             
-            'foto_perfil.dimensions' => 'Las dimensiones de la imagen deben ser minimo de 128x128',            
-            'foto_perfil.image' => 'Porfavor suba un archivo valido de imagen (jpeg,png...)',
+            '_foto_perfil.dimensions' => 'Las dimensiones de la imagen deben ser minimo de 128x128',            
+            '_foto_perfil.image' => 'Porfavor suba un archivo valido de imagen (jpeg,png...)',
         ];
     }
 }

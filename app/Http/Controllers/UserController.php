@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\User\StoreRequest;
 use App\Http\Requests\User\UpdateRequest;
+use App\Libro;
 use App\Role;
 use App\User;
 use Illuminate\Support\Arr;
@@ -14,6 +15,8 @@ use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
+    private $path = 'public/imagenes/profile/';
+    private $default_image = 'public/profile.jpg';
     /**
      * Display a listing of the resource.
      *
@@ -49,16 +52,17 @@ class UserController extends Controller
     public function store(StoreRequest $request)
     {
         $this->authorize('create', Auth::user());
-        
         try {
             DB::transaction(function () use ($request)
             {
                 $datosUsuario = $request->except('roles');
                 $user = User::create($datosUsuario);
                 $request = $this->storeImage($request , $user);
+                
+                
                 $user->password = Hash::make($request->password);
-                if ($request->url_foto != null) {                    
-                    $user->url_foto = $request->url_foto;
+                if ($request->foto_perfil != null) {                    
+                    $user->foto_perfil = $request->foto_perfil;
                 }
                 $user->roles()->sync($request->roles);
                 
@@ -92,7 +96,11 @@ class UserController extends Controller
     public function show(User $user)
     {
         $this->authorize('view', $user);
-        return \view('models.user.show',\compact('user'));
+        $bibliografias = $user->bibliografias->where('bibliografiable_type',Libro::class);
+        $libros = \getChildModel($bibliografias);
+        
+        
+        return \view('models.user.show',\compact('user', 'libros'));
     }
 
     /**
@@ -118,8 +126,8 @@ class UserController extends Controller
     public function update(UpdateRequest $request, User $user)
     {
         $this->authorize('update', $user);
-        if (\request()->has('foto_perfil') && !($user->url_foto === 'public/profile.jpg')) {
-            Storage::delete($user->url_foto);
+        if (\request()->has('_foto_perfil') && !($user->foto_perfil === $this->default_image)) {
+            Storage::delete($user->foto_perfil);
         }
         
         $request = $this->storeImage($request, $user);
@@ -143,18 +151,6 @@ class UserController extends Controller
 
     }
 
-    private function storeImage($request, $user){
-        if ($request->has('foto_perfil')) {
-            $rutaImagen = 'public/imagenes/profile/'.$user->id;
-            if (Storage::allFiles($rutaImagen) == null) {
-                Storage::makeDirectory($rutaImagen);            
-            }  
-            $rutaGuardado = $request->file('foto_perfil')->store($rutaImagen);
-            $request = Arr::add($request, 'url_foto', $rutaGuardado);
-        }
-
-        return $request;
-    }
     /**
      * Remove the specified resource from storage.
      *
@@ -165,4 +161,18 @@ class UserController extends Controller
     {
         //
     }
+
+    //Metodos Propios
+    
+    private function storeImage($request, $user){
+        if ($request->has('_foto_perfil')) {
+            $rutaImagen = $this->path.$user->id;
+            \crearDirectorio($rutaImagen);
+            $rutaGuardado = $request->file('_foto_perfil')->store($rutaImagen);
+            $request = Arr::add($request, 'foto_perfil', $rutaGuardado);
+           
+        }
+
+        return $request;
+    }    
 }

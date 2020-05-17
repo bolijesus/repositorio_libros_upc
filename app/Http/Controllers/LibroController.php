@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 
 class LibroController extends Controller
 {
+    private $path='public/libros/';
     /**
      * Display a listing of the resource.
      *
@@ -24,10 +25,10 @@ class LibroController extends Controller
     {
         $usuario = Auth::user();
         if ($usuario->isAdmin()) {            
-            $libros = Bibliografia::all();
+            $libros = Libro::all();
         }else {
-            
-            $libros = $usuario->bibliografias;
+            $bibliografias_libros = $usuario->bibliografias->where('bibliografiable_type',Libro::class);
+            $libros = \getChildModel($bibliografias_libros);
         }
         return \view('models.libro.index',\compact('libros'));
         
@@ -51,16 +52,17 @@ class LibroController extends Controller
      */
     public function store(StoreRequest $request)
     {   
-        $bibliografia=$request->except(['editorial', 'isbn', 'archivo']);
+        $bibliografia=$request->except(['editorial', 'isbn', '_archivo']);
         $libro=$request->only(['editorial', 'isbn']);                
-        $bibliografia = $this->storeFile($request);
+        $bibliografia = $this->storeFile($request)->except(['editorial', 'isbn', '_archivo']);
         try {
             DB::transaction(function()use($bibliografia, $libro){
                 $libro = Libro::create($libro);
                 $bibliografia = $libro->bibliografia()->create($bibliografia);
-    
+                
             },5);
         } catch (\Throwable $th) {
+            dd($th);
             return \redirect()->route('backoffice.libro.index')->with('alert',swal(
                 "'ERROR en el sistema',
                 'No se pudo subir su archivo, por favor intente mas tarde',
@@ -77,32 +79,7 @@ class LibroController extends Controller
         
     }
 
-    private function storeFile($request, $libro=null)
-    {   
-        if ($libro == null) {
-            $rutaLibros = 'public/libros/'.Auth::id();
-            $request = Arr::add($request, 'user_id', Auth::id());
-        }else{
-            $id_usuario = $libro->bibliografia->usuario->id;
-            $rutaLibros = 'public/libros/'.$id_usuario;
-        }
-
-        $archivo = $request->file('archivo');
-
-        $extencion = $archivo->extension();        
-        $nombre_a_guardar = str_replace(['-',' ',':'],'',Carbon::now());
-        
-        if (Storage::allFiles($rutaLibros) == null) {
-            Storage::makeDirectory($rutaLibros);
-            
-        }
-        $rutaGuardado = $request->file('archivo')->storeAs($rutaLibros,$nombre_a_guardar.'.'.$extencion);
-        $request = Arr::add($request, 'ruta', $rutaGuardado);
-        
-        
-        return $request;
-        
-    }
+    
     /**
      * Display the specified resource.
      *
@@ -140,18 +117,14 @@ class LibroController extends Controller
         try {
             DB::transaction(function () use ($request, $libro)
             {
-                $id_usuario = $libro->bibliografia->usuario->id;
-
-                if (!request()->has('archivo')) {
-                    $libro->bibliografia->update($request->except(['editorial','isbn']));
-                    $libro->update($request->only(['editorial','isbn']));
-                } else {
-                    Storage::delete($libro->bibliografia->ruta);               
-                    $request = $this->storeFile($request, $libro);
-                    $libro->bibliografia->update($request->except(['editorial','isbn']));
+                if (request()->has('_archivo')) {
+                    Storage::delete($libro->bibliografia->archivo);               
+                    $request = $this->updateFile($request, $libro);
+                } 
                     
-                    $libro->update($request->only(['editorial','isbn']));
-                }
+                $libro->bibliografia->update($request->except(['editorial','isbn']));                    
+                $libro->update($request->only(['editorial','isbn']));
+                
             },5);
 
             // TODO::ordenar si en una funcion para guardar archivos y mensajes de swerAler
@@ -182,7 +155,7 @@ class LibroController extends Controller
         if (\request()->ajax()) {
        
             try {
-                Storage::delete($libro->bibliografia->ruta);
+                Storage::delete($libro->bibliografia->archivo);
                 $libro->bibliografia->user_id = null;
                 $libro->bibliografia->save();
                 $libro->bibliografia->delete();
@@ -196,8 +169,46 @@ class LibroController extends Controller
     }
     
     //METODOS PROPIOS
-    public function download(Bibliografia $archivo)
+    private function storeFile($request)
+    {   
+        $id_usuario = Auth::id();
+
+        $request = $this->setFile($request, $id_usuario);
+
+        $request = Arr::add($request, 'user_id', $id_usuario);
+        
+       
+        return $request;
+        
+    }
+
+    private function updateFile($request, $libro)
+    {   
+        $id_usuario = $libro->bibliografia->usuario->id;
+        $request = $this->setFile($request, $id_usuario);        
+        
+        return $request;
+        
+    }
+
+    private function setFile($request, $id_usuario)
     {
+        $archivo = $request->file('_archivo');
+        $extencion = $archivo->extension();        
+        $rutaLibro = $this->path.$id_usuario;
+        $nombre_a_guardar = str_replace(['-',' ',':'],'',Carbon::now());
+        
+        \crearDirectorio($rutaLibro);
+        
+        $rutaGuardado = $request->file('_archivo')->storeAs($rutaLibro,$nombre_a_guardar.'.'.$extencion);
+        $request = Arr::add($request, 'archivo', $rutaGuardado);
+
+        return $request;
+    }
+
+    public function download($bibliografia)
+    {
+        $bibliografia = Bibliografia::findOrFail($bibliografia);
         $usuario = Auth::user();
         $puntosDescargaActuales = $usuario->puntos_descarga;
         if ($puntosDescargaActuales<=0) {
@@ -213,7 +224,7 @@ class LibroController extends Controller
           
             $usuario->save();
         }
-        return Storage::download($archivo->ruta);
+        return Storage::download($bibliografia->archivo);
     }
 
     public function revision(Request $request, Libro $libro)

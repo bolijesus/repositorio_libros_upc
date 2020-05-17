@@ -21,8 +21,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 Route::get('test', function(){
-    $b= Bibliografia::first();
-    dd($b);
+    $usuario=User::first();
+    dd($usuario->bibliografias);
 });
 
 // DB::listen(function($query){
@@ -49,7 +49,7 @@ Route::name('backoffice.')->middleware('auth')->group(function (){
     Route::resource('/user', 'UserController');
 
     Route::resource('/libro', 'LibroController');
-    Route::get('/libro/download/{archivo}','LibroController@download')->name('libro.download');
+    Route::get('/libro/download/{libro}','LibroController@download')->name('libro.download');
     Route::post('/libro/revision/{libro}', 'LibroController@revision')->name('libro.revision');
 
 });

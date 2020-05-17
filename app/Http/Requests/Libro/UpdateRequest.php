@@ -30,7 +30,7 @@ class UpdateRequest extends FormRequest
             'autor' => 'required',
             'editorial' => 'required',
             'isbn' => 'required|numeric',
-            'archivo' => 'file',
+            '_archivo' => 'file',
             'descripcion' => 'required|max:200',
             
         ];

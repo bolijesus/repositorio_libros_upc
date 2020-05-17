@@ -32,7 +32,7 @@ class StoreRequest extends FormRequest
             'direccion' => 'required|max:75',
             'sexo' => 'required',
             'roles' => 'required',
-            'foto_perfil' => 'image|dimensions:min_width=128,min_height=128',
+            '_foto_perfil' => 'image|dimensions:min_width=128,min_height=128',
 
         ];
     }
@@ -64,8 +64,8 @@ class StoreRequest extends FormRequest
 
             'roles.required' => 'Escoja uno o mas roles para asignar',
 
-            'foto_perfil.image' => 'Porfavor suba un archivo valido de imagen (jpeg,png...)',
-            'foto_perfil.dimensions' => 'Las dimensiones de la imagen deben ser minimo de 128x128',
+            '_foto_perfil.image' => 'Porfavor suba un archivo valido de imagen (jpeg,png...)',
+            '_foto_perfil.dimensions' => 'Las dimensiones de la imagen deben ser minimo de 128x128',
         ];
     }
 }

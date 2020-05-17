@@ -76,7 +76,7 @@
         <label for="archivo">Archivo*</label>
         <div class="form-group">
             <div class="form-line">
-                <input type="file" id="archivo" name="archivo" class="form-control">
+                <input type="file" id="archivo" name="_archivo" class="form-control">
             </div>
             <label id="user_name-error" class="error">{{ $errors->first('archivo') }}</label>
         </div>

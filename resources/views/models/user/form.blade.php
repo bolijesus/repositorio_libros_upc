@@ -27,7 +27,7 @@
         <div class="form-group form-float">
             <div class="form-line">
                 <label>Foto de perfil</label>
-                <input type="file" class="form-control" name="foto_perfil">
+                <input type="file" class="form-control" name="_foto_perfil">
             </div> 
             <label id="user_name-error" class="error">{{ $errors->first('foto_perfil') }}</label>   
         </div>

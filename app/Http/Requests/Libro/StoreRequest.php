@@ -30,7 +30,7 @@ class StoreRequest extends FormRequest
             'autor' => 'required',
             'editorial' => 'required',
             'isbn' => 'required|numeric',
-            'archivo' => 'required|file',
+            '_archivo' => 'required|file',
             'descripcion' => 'required|max:200',
             
         ];

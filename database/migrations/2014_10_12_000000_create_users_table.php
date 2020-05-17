@@ -18,7 +18,7 @@ class CreateUsersTable extends Migration
             $table->string('nombre');
             $table->string('apellido');
             $table->string('usuario');
-            $table->string('url_foto')->default('public/profile.jpg');
+            $table->string('foto_perfil')->default('public/profile.jpg');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

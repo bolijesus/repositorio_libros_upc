@@ -29,7 +29,7 @@ class CreateBibliografiasTable extends Migration
             $table->string('titulo');
             $table->string('descripcion');
             $table->string('idioma');
-            $table->string('ruta');
+            $table->string('archivo');
             $table->unsignedTinyInteger('revisado')->default(1)->comment('1:en revision, 2:no aceptado, 3:revisado');
 
             $table->timestamps();

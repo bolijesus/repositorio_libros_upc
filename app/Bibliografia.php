@@ -11,7 +11,7 @@ class Bibliografia extends Model
         'descripcion',
         'fechaPublicacion',
         'idioma',
-        'ruta',
+        'archivo',
         'revisado',
         'user_id',
     ];

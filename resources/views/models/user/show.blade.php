@@ -24,7 +24,7 @@
                 <div class="profile-header">&nbsp;</div>
                 <div class="profile-body">
                     <div class="image-area">
-                        <img src="{{ Storage::url($user->url_foto) }}" alt="AdminBSB - Profile Image" style="width: 128px;height:128px" />
+                        <img src="{{ Storage::url($user->foto_perfil) }}" alt="AdminBSB - Profile Image" style="width: 128px;height:128px" />
                     </div>
                     <div class="content-area">
                         <h3>{{ $user->nombre.' '.$user->apellido }}</h3>
@@ -66,7 +66,7 @@
 
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane fade in active" id="libros">
-                                @include('models.libro.content-index',['libros' => $user->bibliografias])
+                                @include('models.libro.content-index',['libros' => $libros])
                             </div>
                             <div role="tabpanel" class="tab-pane fade in" id="profile_settings">
                                 <form class="form-horizontal">

@@ -17,7 +17,7 @@
                     'success'
                     )
                     $(this).parent().parent().parent().delay("slow").fadeOut();     
-                    let idLibro=$(this).data('libro').id;
+                    let idLibro=$(this).data('libro');
                     eliminar(idLibro);
                 }
             });                                                     
@@ -25,6 +25,9 @@
         });
 
         function eliminar(idLibro){
+            console.log(idLibro);
+            
+            
             $.ajax({
                 type: "DELETE",
                 url: "/libro/"+idLibro,

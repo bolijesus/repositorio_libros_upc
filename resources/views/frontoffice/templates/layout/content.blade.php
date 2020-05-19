@@ -8,7 +8,7 @@
     </div>
 </div>
 <div class="row clearfix">
-    <div class="col-xs-10 col-xs-offset-1">
+    <div class="col-xs-8 col-xs-offset-2">
         <div class="card">
             <div class="header">
                 <h2>LIBROS</h2>
@@ -18,9 +18,9 @@
                     @foreach ($libros as $libro)
                    
                         @if ($libro->bibliografia->revisado == $aceptado)
-                            <div class="col-sm-6 col-md-3 col-xs-12">
+                            <div class="col-sm-6 col-md-4 col-xs-12">
                                 <div class="thumbnail">
-                                    <img src="http://placehold.it/500x300">
+                                    <img src="{{ Storage::url($libro->bibliografia->portada) }}" style="max-width:128px;max-height: 128px; ">
                                     <div class="caption">
                                         <h3>{{ $libro->bibliografia->titulo }}</h3>
                                         <small>por: <span>{{ $libro->bibliografia->usuario->usuario }}</span></small>

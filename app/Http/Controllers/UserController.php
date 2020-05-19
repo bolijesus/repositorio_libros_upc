@@ -26,7 +26,7 @@ class UserController extends Controller
     {
         $users = User::all();
         $roles = Role::all();
-        $this->authorize('viewAny',Auth::user());
+        $this->authorize('viewAny',\Auth::user());
         return \view('models.user.index', \compact('users', 'roles'));
     }
 
@@ -37,7 +37,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        $this->authorize('create', Auth::user());
+        $this->authorize('create', \Auth::user());
         $user = new User();
         $roles = Role::all();
         return \view('models.user.create')->with(\compact('user', 'roles'));
@@ -51,7 +51,7 @@ class UserController extends Controller
      */
     public function store(StoreRequest $request)
     {
-        $this->authorize('create', Auth::user());
+        $this->authorize('create', \Auth::user());
         try {
             DB::transaction(function () use ($request)
             {
@@ -96,10 +96,10 @@ class UserController extends Controller
     public function show(User $user)
     {
         $this->authorize('view', $user);
-        $bibliografias = $user->bibliografias->where('bibliografiable_type',Libro::class);
-        $libros = \getChildModel($bibliografias);
-        
-        
+        $bibliografias = $user->bibliografias->where('bibliografiable_type',Libro::class)
+        ->load('bibliografiable');        
+        $libros = \getChildModel($bibliografias)->load(['bibliografia','bibliografia.usuario']);
+   
         return \view('models.user.show',\compact('user', 'libros'));
     }
 

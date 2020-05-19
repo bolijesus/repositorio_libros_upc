@@ -82,7 +82,7 @@
         <label id="user_name-error" class="error" for="user_name">{{ $errors->first('sexo') }}</label>
     </div>
 
-    @can('viewAny', Auth::user())
+    @can('viewAny', \Auth::user())
     <div class="form-group form-float">
         <div class="row clearfix">
             <div class="demo-checkbox">

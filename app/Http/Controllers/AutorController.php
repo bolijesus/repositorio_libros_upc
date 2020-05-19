@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Role;
+use App\Autor;
 use Illuminate\Http\Request;
 
-class RoleController extends Controller
+class AutorController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,8 +14,8 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $roles = Role::all();
-        return \view('models.role.index',\compact('roles'));
+        $autores = Autor::all();
+        return \view('models.autor.index',\compact('autores'));
     }
 
     /**
@@ -25,7 +25,7 @@ class RoleController extends Controller
      */
     public function create()
     {
-        return \view('models.role.create');
+        return \view('models.autor.create');
     }
 
     /**
@@ -37,12 +37,12 @@ class RoleController extends Controller
     public function store(Request $request)
     {
         \validator($request->all(),['nombre'=>'required']);
-        
-        Role::create($request->all());
-        
-        return \redirect()->route('backoffice.role.index')->with('alert',\swal("
+
+        Autor::create($request->all());
+
+        return \redirect()->route('backoffice.autor.index')->with('alert',\swal("
             'EXITO!',
-            'Rol {$request->nombre} creado con Exito!',
+            'Autor {$request->nombre} creado con Exito!',
             'success'
 
         "));
@@ -51,10 +51,10 @@ class RoleController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Role  $role
+     * @param  \App\Autor  $autor
      * @return \Illuminate\Http\Response
      */
-    public function show(Role $role)
+    public function show(Autor $autor)
     {
         //
     }
@@ -62,10 +62,10 @@ class RoleController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Role  $role
+     * @param  \App\Autor  $autor
      * @return \Illuminate\Http\Response
      */
-    public function edit(Role $role)
+    public function edit(Autor $autor)
     {
         //
     }
@@ -74,10 +74,10 @@ class RoleController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Role  $role
+     * @param  \App\Autor  $autor
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Role $role)
+    public function update(Request $request, Autor $autor)
     {
         //
     }
@@ -85,10 +85,10 @@ class RoleController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Role  $role
+     * @param  \App\Autor  $autor
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Role $role)
+    public function destroy(Autor $autor)
     {
         //
     }

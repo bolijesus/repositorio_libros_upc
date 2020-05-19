@@ -1,7 +1,7 @@
 <?php
 
 use App\Bibliografia;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\HtmlString;
 
@@ -26,10 +26,11 @@ if (!function_exists('crearDirectorio')) {
     }
 }
 if (!function_exists('getChildModel')) {
-    function getChildModel($bilbiografias)
-    {
-        $model = \collect();
-        foreach ($bilbiografias as $bibliografia) {
+    function getChildModel($bibliografias)
+    {       
+        $bibliografias = $bibliografias;
+        $model = new Collection();
+        foreach ($bibliografias as $bibliografia) {
             $model->push($bibliografia->bibliografiable);
         }
 

@@ -4,8 +4,6 @@
 <!-- Bootstrap Core Js -->
 <script src="{{ asset('js/bootstrap/bootstrap.min.js') }}"></script>
 
-<!-- Select Plugin Js -->
-<script src="{{ asset('js/bootstrap-select/bootstrap-select.min.js') }}"></script>
 
 <!-- Slimscroll Plugin Js -->
 <script src="{{ asset('js/jquery-slimscroll/jquery.slimscroll.js') }}"></script>
@@ -22,11 +20,11 @@
 <script src="{{ asset('js/sweetalert/sweetalert.min.js') }}"></script>
 <script src="{{ asset('js/pages/ui/dialogs.js') }}"></script>
 <script src="{{ asset('js/custom.js') }}"></script>
+@yield('scripts')
+
+
 @if (session()->has('alert'))
 <script>Swal.fire({{ session('alert') }} )</script>
 @endif
-
-@yield('scripts')
-
     </body>
 </html>

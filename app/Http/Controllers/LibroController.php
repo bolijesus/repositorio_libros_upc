@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Autor;
 use App\Bibliografia;
 use App\Http\Requests\Libro\StoreRequest;
 use App\Http\Requests\libro\UpdateRequest;
@@ -16,6 +17,8 @@ use Illuminate\Support\Facades\Storage;
 class LibroController extends Controller
 {
     private $path='public/libros/';
+    private $default_portada='public/portada.png';
+    private $path_image = 'public/imagenes/libros/';
     /**
      * Display a listing of the resource.
      *
@@ -23,12 +26,12 @@ class LibroController extends Controller
      */
     public function index()
     {
-        $usuario = Auth::user();
+        $usuario = \auth()->user();        
         if ($usuario->isAdmin()) {            
-            $libros = Libro::all();
+            $libros = Libro::all()->load(['bibliografia','bibliografia.usuario','bibliografia.autores']);
         }else {
             $bibliografias_libros = $usuario->bibliografias->where('bibliografiable_type',Libro::class);
-            $libros = \getChildModel($bibliografias_libros);
+            $libros = \getChildModel($bibliografias_libros)->load(['bibliografia','bibliografia.usuario','bibliografia.autores']);
         }
         return \view('models.libro.index',\compact('libros'));
         
@@ -40,8 +43,9 @@ class LibroController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {
-        return \view('models.libro.create',['libro' => new Libro()]);
+    {   
+        $autores = Autor::all();
+        return \view('models.libro.create',['libro' => new Libro(), 'autores' => $autores]);
     }
 
     /**
@@ -52,14 +56,18 @@ class LibroController extends Controller
      */
     public function store(StoreRequest $request)
     {   
-        $bibliografia=$request->except(['editorial', 'isbn', '_archivo']);
         $libro=$request->only(['editorial', 'isbn']);                
-        $bibliografia = $this->storeFile($request)->except(['editorial', 'isbn', '_archivo']);
-        try {
-            DB::transaction(function()use($bibliografia, $libro){
-                $libro = Libro::create($libro);
-                $bibliografia = $libro->bibliografia()->create($bibliografia);
+        $bibliografia = $this->storeFile($request);
+        $autores = $request->autores;
                 
+        try {
+            DB::transaction(function()use($bibliografia, $libro, $autores){
+                $libro = Libro::create($libro);
+                $bibliografia = $this->storeImage($bibliografia, $libro);
+                $bibliografia=$bibliografia->except(['editorial', 'isbn', '_archivo']);
+                
+                $bibliografia = $libro->bibliografia()->create($bibliografia);
+                $bibliografia->autores()->sync($autores);
             },5);
         } catch (\Throwable $th) {
             dd($th);
@@ -88,6 +96,7 @@ class LibroController extends Controller
      */
     public function show(Libro $libro)
     {
+        $libro = $libro->load(['bibliografia', 'bibliografia.autores']);
         return \view('models.libro.show',\compact('libro'));
     }
 
@@ -100,7 +109,8 @@ class LibroController extends Controller
     public function edit(Libro $libro)
     {
         FacadesGate::authorize('editar-libros', $libro);
-        return \view('models.libro.edit',['libro' => $libro] );
+        $autores = Autor::all();
+        return \view('models.libro.edit',\compact('autores','libro') );
     }
 
     /**
@@ -112,19 +122,29 @@ class LibroController extends Controller
      */
     public function update(UpdateRequest $request, Libro $libro)
     {
+        $libro = $libro->with(['bibliografia','bibliografia.autores'])->get()->first();
         FacadesGate::authorize('editar-libros', $libro);
-        
+        $bibliografia = $libro->bibliografia;
+        if (\request()->has('_portada') && !($bibliografia->portada === $this->default_portada)) {
+            Storage::delete($bibliografia->portada);
+        }
+        $request = $this->storeImage($request, $libro);
+        $autores = $request->autores;
         try {
-            DB::transaction(function () use ($request, $libro)
+            DB::transaction(function () use ($request, $libro, $autores)
             {
                 if (request()->has('_archivo')) {
                     Storage::delete($libro->bibliografia->archivo);               
                     $request = $this->updateFile($request, $libro);
-                } 
-                    
+                }  
+
+                if ( !Auth::user()->isAdmin() && $libro->bibliografia->revisado != 1 ) {
+                    $request = Arr::add($request,'revisado',1);
+                }
+                  
                 $libro->bibliografia->update($request->except(['editorial','isbn']));                    
                 $libro->update($request->only(['editorial','isbn']));
-                
+                $libro->bibliografia->autores()->sync($autores);
             },5);
 
             // TODO::ordenar si en una funcion para guardar archivos y mensajes de swerAler
@@ -152,10 +172,13 @@ class LibroController extends Controller
      */
     public function destroy(Libro $libro)
     {
+        $libro = $libro->with(['bibliografia'])->get()->first();
         if (\request()->ajax()) {
-       
             try {
                 Storage::delete($libro->bibliografia->archivo);
+                if ($libro->bibliografia->portada != $this->path_image) {
+                    Storage::delete($libro->bibliografia->portada);
+                }
                 $libro->bibliografia->user_id = null;
                 $libro->bibliografia->save();
                 $libro->bibliografia->delete();
@@ -169,20 +192,20 @@ class LibroController extends Controller
     }
     
     //METODOS PROPIOS
-    private function storeFile($request)
+    private function storeFile(Request $request)
     {   
-        $id_usuario = Auth::id();
+        $id_usuario = Auth::user()->id;
 
         $request = $this->setFile($request, $id_usuario);
 
         $request = Arr::add($request, 'user_id', $id_usuario);
         
-       
+        
         return $request;
         
     }
 
-    private function updateFile($request, $libro)
+    private function updateFile(Request $request, $libro)
     {   
         $id_usuario = $libro->bibliografia->usuario->id;
         $request = $this->setFile($request, $id_usuario);        
@@ -191,20 +214,33 @@ class LibroController extends Controller
         
     }
 
-    private function setFile($request, $id_usuario)
+    private function setFile(Request $request, $id_usuario)
     {
         $archivo = $request->file('_archivo');
         $extencion = $archivo->extension();        
         $rutaLibro = $this->path.$id_usuario;
         $nombre_a_guardar = str_replace(['-',' ',':'],'',Carbon::now());
-        
         \crearDirectorio($rutaLibro);
+        
         
         $rutaGuardado = $request->file('_archivo')->storeAs($rutaLibro,$nombre_a_guardar.'.'.$extencion);
         $request = Arr::add($request, 'archivo', $rutaGuardado);
 
         return $request;
     }
+
+    private function storeImage($request, $libro){
+        
+        if ($request->has('_portada')) {
+            $rutaImagen = $this->path_image.$libro->id;
+            \crearDirectorio($rutaImagen);
+            $rutaGuardado = $request->file('_portada')->store($rutaImagen);
+            $request = Arr::add($request, 'portada', $rutaGuardado);
+           
+        }
+
+        return $request;
+    }    
 
     public function download($bibliografia)
     {

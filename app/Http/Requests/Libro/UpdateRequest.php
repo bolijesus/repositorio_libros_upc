@@ -26,12 +26,13 @@ class UpdateRequest extends FormRequest
         return [
             'titulo' => 'required|max:100',
             'idioma' => 'required',
-            'genero' => 'required',
-            'autor' => 'required',
+            'generos' => 'required',
+            'autores' => 'required',
             'editorial' => 'required',
             'isbn' => 'required|numeric',
             '_archivo' => 'file',
             'descripcion' => 'required|max:200',
+            '_portada' => 'image|dimensions:min_width=128,min_height=128',
             
         ];
     }

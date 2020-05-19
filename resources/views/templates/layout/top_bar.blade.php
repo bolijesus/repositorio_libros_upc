@@ -12,7 +12,7 @@
                 {{-- <li><a href="javascript:void(0);" class="js-search" data-close="true"><i class="material-icons">search</i></a></li> --}}
                 <!-- #END# Call Search -->
                 {{-- <li class="pull-right"><a href="javascript:void(0);" class="js-right-sidebar" data-close="true"><i class="material-icons">more_vert</i></a></li> --}}
-                @auth
+                @if(Auth::user())
                     <li class="pull-right">
                         <a href="{{ route('logout') }}" onclick="event.preventDefault();
                         document.getElementById('logout-form').submit();" class="lg-outer _btn btn bg-white col-black waves-effect waves-green ">
@@ -25,13 +25,13 @@
                     <li class="pull-right">
                         <a href="#" class="lg-outer _btn btn bg-white col-black waves-effect waves-green ">
                             PUNTOS PARA DESCARGAR
-                            <span class="puntos badge">{{ Auth::user()->isAdmin() ? 'ILIMITED' : Auth::user()->puntos_descarga }}</span>
+                            <span class="puntos badge">{{ \Auth::user()->isAdmin() ? 'ILIMITED' : \Auth::user()->puntos_descarga }}</span>
                         </a>
                         
                     </li>
                     <li class="pull-right">
                     
-                        <a href="{{ route('backoffice.user.show',Auth::user()) }}" class="lg-outer _btn btn bg-white col-black waves-effect waves-green ">
+                        <a href="{{ route('backoffice.user.show',\Auth::user()) }}" class="lg-outer _btn btn bg-white col-black waves-effect waves-green ">
                             DASHBOARD
                         </a>   
                     </li>
@@ -41,7 +41,7 @@
                             LogIn
                         </a>   
                     </li>
-                @endauth
+                @endif
                 
             </ul>
         </div>

@@ -12,6 +12,7 @@ class Bibliografia extends Model
         'fechaPublicacion',
         'idioma',
         'archivo',
+        'portada',
         'revisado',
         'user_id',
     ];
@@ -25,6 +26,23 @@ class Bibliografia extends Model
     public function usuario()
     {
        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function autores()
+    {
+        return $this->belongsToMany(Autor::class);
+    }
+
+    //METODOS
+    public function hasAutor($autorToSearch)
+    {
+        foreach ($this->autores as $autor_bibliografia) {
+            
+            if ($autor_bibliografia->id == $autorToSearch->id) {
+               
+                return true;
+            }
+        }
     }
     
 }

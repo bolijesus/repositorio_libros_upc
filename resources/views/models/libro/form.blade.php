@@ -1,7 +1,5 @@
-
-
-<div class="row clearfix">
-    <div class="col-xs-12 col-md-3">
+<div class="row clear-fix">
+    <div class="col-xs-12 col-md-6">
         <label for="titulo">Titulo*</label>
         <div class="form-group">
             <div class="form-line">
@@ -11,42 +9,57 @@
             <label id="user_name-error" class="error">{{ $errors->first('titulo') }}</label>
         </div>
     </div>
-    <div class="col-xs-12 col-md-3 ">
+    <div class="col-xs-12 col-xs-6">
         <div class="row clearfix">
-            <div class="col-sm-12 form-group" style="margin-top: 24px;">
-                <select class="form-control show-tick" name="idioma">
-                    <option value="">-- Idioma* --</option>
-                    <option value="1">Español</option>
-                    <option value="2">Ingles</option>
-                    <option value="3">Aleman</option>
-                </select>
-                <label id="user_name-error" class="error">{{ $errors->first('idioma') }}</label>
+            <div class="col-sm-12" style="margin-top: 24px;">
+                <label for="">Autores</label>
+                <div class="form-group">
+                    <select class="selects-form-libros" multiple name="autores[]">
+                        <optgroup label="---Selecciona uno o mas autores---">
+                        @foreach ($autores as $autor)
+                        
+                        <option value="{{ $autor->id }}" {{ optional($libro->bibliografia)->hasAutor($autor) ? 'selected' : '' }}>{{ $autor->nombre }}</option>
+                            
+                        @endforeach
+                        </optgroup>
+                    </select>
+                </div>
+                <label id="user_name-error" class="error">{{ $errors->first('autores') }}</label>
             </div>
         </div>
     </div>
-    <div class="col-xs-12 col-md-3 ">
+    <div class="col-xs-12 col-md-6">
         <div class="row clearfix">
-            <div class="col-sm-12 form-group" style="margin-top: 24px;">
-                <select class="form-control show-tick" name="genero">
-                    <option value="">-- Genero* --</option>
-                    <option value="1">Genero 1</option>
-                    <option value="2">Genero 2</option>
-                    <option value="3">Genero 3</option>
-                </select>
+            <div class="col-sm-12" style="margin-top: 24px;">
+                <label for="">Generos</label>
+                <div class="form-group">
+                    <select class="selects-form-libros" multiple name="generos[]">
+                        <optgroup label="Alaskan/Hawaiian Time Zone">
+                          <option selected value="AK" data-select2-id="66">Alaska</option>
+                          <option value="HI" data-select2-id="67">Hawaii</option>
+                        </optgroup>
+                    </select>
+                </div>
+                
+                <label id="user_name-error" class="error">{{ $errors->first('generos') }}</label>
+            </div>
+        </div>
+        
+    </div>
+    <div class="col-xs-12 col-md-6">
+        <div class="row clearfix">
+            <div class="col-sm-12" style="margin-top: 24px;">
+                <label for="">Idioma</label>
+                <div class="form-group">
+                    <select class="selects-form-libros" name="idioma">
+                        <optgroup label="Elije un idioma para tu libro">
+                        <option value="1">ingles</option>
+                        <option value="1">español</option>
+                        </optgroup>
+                    </select>
+                </div>
+                
                 <label id="user_name-error" class="error">{{ $errors->first('genero') }}</label>
-            </div>
-        </div>
-    </div>
-    <div class="col-xs-12 col-md-3 ">
-        <div class="row clearfix">
-            <div class="col-sm-12 form-group" style="margin-top: 24px;">
-                <select class="form-control show-tick" name="autor">
-                    <option value="">-- Autor* --</option>
-                    <option value="1">Autor 1</option>
-                    <option value="2">Autor 2</option>
-                    <option value="3">Autor 3</option>
-                </select>
-                <label id="user_name-error" class="error">{{ $errors->first('autor') }}</label>
             </div>
         </div>
     </div>
@@ -81,9 +94,10 @@
             <label id="user_name-error" class="error">{{ $errors->first('archivo') }}</label>
         </div>
     </div>
+    
 </div>
 <div class="row clearfix">
-    <div class="col-xs-12 ">
+    <div class="col-xs-8 ">
         <div class="row clearfix">
             <div class="col-sm-12">
                 <div class="form-group">
@@ -96,6 +110,15 @@
                     <label id="user_name-error" class="error">{{ $errors->first('descripcion') }}</label>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="col-xs-12 col-md-4" style="margin-top: 57px;">
+        <label for="archivo">Imgen de portada*</label>
+        <div class="form-group">
+            <div class="form-line">
+                <input type="file" id="archivo" name="_portada" class="form-control">
+            </div>
+            <label id="user_name-error" class="error">{{ $errors->first('archivo') }}</label>
         </div>
     </div>
 </div>

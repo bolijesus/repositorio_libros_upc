@@ -18,12 +18,12 @@ class ResetPointsDownload
     public function handle($request, Closure $next)
     {
         $response = $next($request);
-        if (Auth::check()) {
-            $ayer = Auth::user()->updated_at->day;
+        if (\Auth::user()) {
+            $ayer = \Auth::user()->updated_at->day;
             $hoy = Carbon::now()->day;
             if (($hoy>$ayer)) {
             
-                $usuario = Auth::user();
+                $usuario = \Auth::user();
                 if ($usuario->puntos_descarga <5) {
                     $usuario->puntos_descarga = 5;      
                     $usuario->save();
@@ -35,4 +35,6 @@ class ResetPointsDownload
         
         return $response;
     }
+
+    
 }

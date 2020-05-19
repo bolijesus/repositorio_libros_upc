@@ -3,15 +3,15 @@
     <!-- User Info -->
     <div class="user-info">
         <div class="image">
-            <img src="{{ Storage::url(Auth::user()->foto_perfil) }}" width="48" height="48" alt="User" />
+            <img src="{{ Storage::url(\Auth::user()->foto_perfil) }}" width="48" height="48" alt="User" />
         </div>
         <div class="info-container">
-            <div class="name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ Auth::user()->nombre }}</div>
-            <div class="email">{{ Auth::user()->usuario }}</div>
+            <div class="name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ \Auth::user()->nombre }}</div>
+            <div class="email">{{ \Auth::user()->usuario }}</div>
             <div class="btn-group user-helper-dropdown">
                 <i class="material-icons" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">keyboard_arrow_down</i>
                 <ul class="dropdown-menu pull-right">
-                    <li><a href="{{ route('backoffice.user.show',Auth::user()) }}"><i class="material-icons">person</i>Perfil</a></li>
+                    <li><a href="{{ route('backoffice.user.show',\Auth::user()) }}"><i class="material-icons">person</i>Perfil</a></li>
                     <li role="separator" class="divider"></li>
                     <li><a href="{{ route('logout') }}" onclick="event.preventDefault();
                         document.getElementById('logout-form').submit();"><i class="material-icons">input</i>Cerrar Sesion</a></li>
@@ -27,7 +27,7 @@
     <div class="menu">
         
         <ul class="list">
-            @if (Auth::user()->isAdmin())
+            @if (\Auth::user()->isAdmin())
                 <li class="{{ active('backoffice.role.*') }}">
                     <a href="#" class="menu-toggle">
                         <i class="material-icons">star</i>
@@ -65,6 +65,24 @@
                     </ul>
                 </li>                
             @endif
+            <li class="{{ active('backoffice.autor.*') }}">
+                <a href="#" class="menu-toggle">
+                    <i class="material-icons">sentiment_very_satisfied</i>
+                    <span>Autores</span>
+                </a>
+                <ul class="ml-menu">
+                    <li class="{{ active('backoffice.autor.index') }}">
+                        <a href="{{ route('backoffice.autor.index') }}">
+                            <span>Listar</span>
+                        </a>
+                    </li>
+                    <li class="{{ active('backoffice.autor.create') }}">
+                        <a href="{{ route('backoffice.autor.create') }}">
+                            <span>Crear</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
             <li class="{{ active('backoffice.libro.*') }}">
                 <a href="#" class="menu-toggle">
                     <i class="material-icons">library_books</i>

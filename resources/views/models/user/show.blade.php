@@ -1,3 +1,4 @@
+
 @extends('templates.index')
 
 @section('title','Usuario|'.$user->usuario)
@@ -173,5 +174,5 @@
 <script src="{{ asset('js/jquery-datatable/extensions/export/buttons.html5.min.js') }}"></script>
 <script src="{{ asset('js/jquery-datatable/extensions/export/buttons.print.min.js') }}"></script>
 <script src="{{ asset('js/tables/jquery-datatable.js') }}"></script>
-
+@include('models.libro.delete')
 @endsection

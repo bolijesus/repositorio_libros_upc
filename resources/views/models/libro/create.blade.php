@@ -4,7 +4,7 @@
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('css\bootstrap-select\bootstrap-select.min.css') }}">
-
+<link rel="stylesheet" href="{{ asset('css/select2/select2.min.css') }}">
 @endsection
 
 {{-- SECCION PARA CAMBIAR LA CLASE DE LA ETIQUETA BODY PARA EL INICIO DE SESION --}}
@@ -41,8 +41,9 @@
 
 @endsection
 
-
 @section('scripts')
-    {{-- <script>alert()</script> --}}
+
+<script src="{{ asset('js/select2/select2.min.js') }}"></script>
+<script src="{{ asset('js/select2/run.js') }}"></script>
 
 @endsection

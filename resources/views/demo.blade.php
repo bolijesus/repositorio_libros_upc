@@ -3,7 +3,8 @@
 @section('title','Titulo DEMO')
 
 @section('css')
-    {{-- <link rel="stylesheet" href="style.css"> --}}
+   {{-- <link rel="stylesheet" href="{{ asset('css/bootstrap/bootstrap.min.css') }}"> --}}
+    <link rel="stylesheet" href="{{ asset('css/select2/select2.min.css') }}">
 @endsection
 
 {{-- SECCION PARA CAMBIAR LA CLASE DE LA ETIQUETA BODY PARA EL INICIO DE SESION --}}
@@ -19,10 +20,12 @@
 
 @section('content')
 
-@endsection
 
 
 @section('scripts')
-    {{-- <script>alert()</script> --}}
+{{-- <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
+<script src="{{ asset('js/bootstrap/bootstrap.min.js') }}"></script> --}}
+<script src="{{ asset('js/select2/select2.min.js') }}"></script>
+<script src="{{ asset('js/select2/run.js') }}"></script>
 
 @endsection

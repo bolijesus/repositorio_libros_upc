@@ -35,7 +35,7 @@
                         <div class="col-xs-12 col-md-3">
                             <label for="titulo">Imagen</label>
                             <div class="thumbnail">
-                                <img src="http://placehold.it/500x300">
+                                <img src="{{ Storage::url($libro->bibliografia->portada) }}" style="width: 128px;height: 128px;">
                             </div>
                         </div>
                         <div class="col-xs-12 col-md-3">
@@ -63,10 +63,10 @@
                             </div>
                         </div>                        
                         <div class="col-xs-12 col-md-3">
-                            <label for="autor">autor</label>
+                            <label for="autor">autores</label>
                             <div class="form-group">
                                 <div class="form-line">
-                                    <input disabled type="text" id="autor" class="form-control" value="{{ $libro->bibliografia->autor }}">
+                                    <input disabled type="text" id="autor" class="form-control" value="@foreach ($libro->bibliografia->autores as $autor){{ $autor->nombre }} - @endforeach">
                                 </div>
                             </div>
                         </div>
@@ -81,7 +81,7 @@
                             </div>
                             <div class="col-xs-12 col-md-2 ">
                                 <div class="form-group">
-                                    <a href="{{ route('backoffice.libro.download',$libro->bibliografia) }}" data-user="{{ Auth::user() }}" class="descargar-ajax btn btn-lg bg-primary waves-effect pull-right btn-upc" role="button">
+                                    <a href="{{ route('backoffice.libro.download',$libro->bibliografia) }}" data-user="{{ \Auth::user() }}" class="descargar-ajax btn btn-lg bg-primary waves-effect pull-right btn-upc" role="button">
                                         DESCARGAR
                                     </a>
                                 </div>
@@ -104,7 +104,7 @@
                             </div>
                         </div>
                     </div>
-                    @if (Auth::user()->isAdmin())
+                    @if (\Auth::user()->isAdmin())
                    <div class="row clearfix pull-right">
                             <div class="col-xs-12 ">
                                 <input name="revisado" type="radio" id="radio_1" value="3"

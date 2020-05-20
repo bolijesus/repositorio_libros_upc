@@ -122,7 +122,7 @@ class LibroController extends Controller
      */
     public function update(UpdateRequest $request, Libro $libro)
     {
-        $libro = $libro->with(['bibliografia','bibliografia.autores'])->get()->first();
+        $libro = $libro->load(['bibliografia','bibliografia.autores']);
         FacadesGate::authorize('editar-libros', $libro);
         $bibliografia = $libro->bibliografia;
         if (\request()->has('_portada') && !($bibliografia->portada === $this->default_portada)) {
@@ -172,7 +172,7 @@ class LibroController extends Controller
      */
     public function destroy(Libro $libro)
     {
-        $libro = $libro->with(['bibliografia'])->get()->first();
+        $libro = $libro->load(['bibliografia']);
         if (\request()->ajax()) {
             try {
                 Storage::delete($libro->bibliografia->archivo);

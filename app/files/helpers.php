@@ -18,7 +18,9 @@ if (!function_exists('swal')) {
 if (!function_exists('crearDirectorio')) {
     function crearDirectorio($paht)
     {
+       
         if (Storage::allFiles($paht) == null) {
+            
             Storage::makeDirectory($paht);
             
         }

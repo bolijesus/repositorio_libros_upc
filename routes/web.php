@@ -46,6 +46,7 @@ Route::name('backoffice.')->middleware('auth')->group(function (){
     Route::resource('/role', 'RoleController');
     Route::resource('/user', 'UserController');
     Route::resource('/autor', 'AutorController');
+    Route::resource('/genero', 'GeneroController');
     
 
     Route::resource('/libro', 'LibroController');

@@ -1,3 +1,4 @@
+
 <div class="row clear-fix">
     <div class="col-xs-12 col-md-6">
         <label for="titulo">Titulo*</label>
@@ -34,9 +35,12 @@
                 <label for="">Generos</label>
                 <div class="form-group">
                     <select class="selects-form-libros" multiple name="generos[]">
-                        <optgroup label="Alaskan/Hawaiian Time Zone">
-                          <option selected value="AK" data-select2-id="66">Alaska</option>
-                          <option value="HI" data-select2-id="67">Hawaii</option>
+                        <optgroup label="---Selecciona uno o mas Generos---">
+                            @foreach ($generos as $genero)
+                            
+                            <option value="{{ $genero->id }}" {{ optional($libro->bibliografia)->hasGenero($genero) ? 'selected' : '' }}>{{ $genero->nombre }}</option>
+                                
+                            @endforeach
                         </optgroup>
                     </select>
                 </div>

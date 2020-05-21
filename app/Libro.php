@@ -13,4 +13,5 @@ class Libro extends Model
     {
         return $this->morphOne(Bibliografia::class, 'bibliografiable');
     }
+
 }

@@ -104,6 +104,23 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row clearfix">
+                        @if (Auth::user()->isAdmin() || Auth::user()->id == $libro->bibliografia->usuario->id )
+                        <div class="col-xs-12 ">
+                            <div class="row clearfix">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="titulo">Mensaje de revision</label>
+                                        <small></small>
+                                        <div class="form-line">
+                                            <textarea name="contenido" {{ ! Auth::user()->isAdmin()?'disabled':'' }} rows="4" class="form-control no-resize" placeholder="Descripcion...">{{ $libro->bibliografia->descripcion }}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                     @if (\Auth::user()->isAdmin())
                    <div class="row clearfix pull-right">
                             <div class="col-xs-12 ">

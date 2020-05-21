@@ -33,6 +33,11 @@ class Bibliografia extends Model
         return $this->belongsToMany(Autor::class);
     }
 
+    public function generos()
+    {
+        return $this->belongsToMany(Genero::class);
+    }
+
     //METODOS
     public function hasAutor($autorToSearch)
     {
@@ -43,6 +48,22 @@ class Bibliografia extends Model
                 return true;
             }
         }
+        return \false;
+    }
+
+    public function hasGenero($generoToSearch)
+    {
+       
+        foreach ($this->generos as $genero_bibliografia) {
+            
+            if ($genero_bibliografia->id == $generoToSearch->id) {
+               
+                
+                return true;
+            }
+        }
+
+        return \false;
     }
     
 }

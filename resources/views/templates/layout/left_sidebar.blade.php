@@ -46,6 +46,24 @@
                         </li>
                     </ul>
                 </li>
+                <li class="{{ active('backoffice.role.*') }}">
+                    <a href="#" class="menu-toggle">
+                        <i class="material-icons">collections_bookmark</i>
+                        <span>Generos</span>
+                    </a>
+                    <ul class="ml-menu">
+                        <li class="{{ active('backoffice.genero.index') }}">
+                            <a href="{{ route('backoffice.genero.index') }}">
+                                <span>Listar</span>
+                            </a>
+                        </li>
+                        <li class="{{ active('backoffice.genero.create') }}">
+                            <a href="{{ route('backoffice.genero.create') }}">
+                                <span>Crear</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
                 <li class="{{ active('backoffice.user.*') }}">
                     <a href="#" class="menu-toggle">
                         <i class="material-icons">people</i>

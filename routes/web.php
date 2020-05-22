@@ -52,7 +52,7 @@ Route::name('backoffice.')->middleware('auth')->group(function (){
     Route::resource('/libro', 'LibroController');
     Route::get('/libro/download/{libro}','LibroController@download')->name('libro.download');
     Route::post('/libro/revision/{libro}', 'LibroController@revision')->name('libro.revision');
-
+    Route::post('/puntos/{libro}', 'LibroController@puntosActuales');
 });
 Auth::routes(['register' => false]);
 

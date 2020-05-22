@@ -62,11 +62,11 @@ class LibroController extends Controller
         $bibliografia = $this->storeFile($request);
         $autores = $request->autores;
         $generos = $request->generos;
-                
+        
         try {
             DB::transaction(function()use($bibliografia, $libro, $autores, $generos){
                 $libro = Libro::create($libro);
-                $bibliografia = $this->storeImage($bibliografia, $libro);
+                $bibliografia = $this->storeImage($bibliografia, Auth::user());
                 $bibliografia=$bibliografia->except(['editorial', 'isbn', '_archivo']);
                 
                 $bibliografia = $libro->bibliografia()->create($bibliografia);
@@ -127,13 +127,14 @@ class LibroController extends Controller
      */
     public function update(UpdateRequest $request, Libro $libro)
     {
+        $usuario = $libro->bibliografia->usuario;
         $libro = $libro->load(['bibliografia','bibliografia.autores']);
         FacadesGate::authorize('editar-libros', $libro);
         $bibliografia = $libro->bibliografia;
         if (\request()->has('_portada') && !($bibliografia->portada === $this->default_portada)) {
             Storage::delete($bibliografia->portada);
         }
-        $request = $this->storeImage($request, $libro);
+        $request = $this->storeImage($request, $usuario);
         $autores = $request->autores;
         $generos = $request->generos;
         try {
@@ -183,7 +184,7 @@ class LibroController extends Controller
         if (\request()->ajax()) {
             try {
                 Storage::delete($libro->bibliografia->archivo);
-                if ($libro->bibliografia->portada != $this->path_image) {
+                if ($libro->bibliografia->portada != $this->default_portada) {
                     Storage::delete($libro->bibliografia->portada);
                 }
                 // $libro->bibliografia->user_id = null;
@@ -224,7 +225,7 @@ class LibroController extends Controller
     private function setFile(Request $request, $id_usuario)
     {
         $archivo = $request->file('_archivo');
-        $extencion = $archivo->extension();        
+        $extencion = $archivo->clientExtension();        
         $rutaLibro = $this->path.$id_usuario;
         $nombre_a_guardar = str_replace(['-',' ',':'],'',Carbon::now());
         \crearDirectorio($rutaLibro);
@@ -236,10 +237,10 @@ class LibroController extends Controller
         return $request;
     }
 
-    private function storeImage($request, $libro){
+    private function storeImage($request, $usuario){
         
         if ($request->has('_portada')) {
-            $rutaImagen = $this->path_image.$libro->bibliografia->usuario->id;
+            $rutaImagen = $this->path_image.$usuario->id;
             \crearDirectorio($rutaImagen);
             $rutaGuardado = $request->file('_portada')->store($rutaImagen);
             $request = Arr::add($request, 'portada', $rutaGuardado);
@@ -304,7 +305,6 @@ class LibroController extends Controller
                     'contenido' => $mensajeRevision
                 ]);
             }
-            $bibliografia->mensaje->save();
         }elseif ($revision == $revisado) {
             $bibliografia->revisado = $revisado;
             \asignarPuntos($libro->bibliografia);
@@ -318,5 +318,12 @@ class LibroController extends Controller
         return \redirect()->route('backoffice.libro.index')->with('alert',swal($mensaje));
     }
 
+    public function puntosActuales($bibliografia)
+    {
+        $bibliografia = Bibliografia::findOrFail($bibliografia);
+        if (\request()->ajax()) {
+            return $bibliografia->usuario->puntos_descarga;
+        }
+    }
      
 }

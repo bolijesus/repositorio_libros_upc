@@ -81,7 +81,7 @@
                             </div>
                             <div class="col-xs-12 col-md-2 ">
                                 <div class="form-group">
-                                    <a href="{{ route('backoffice.libro.download',$libro->bibliografia) }}" data-user="{{ \Auth::user() }}" class="descargar-ajax btn btn-lg bg-primary waves-effect pull-right btn-upc" role="button">
+                                    <a href="{{ route('backoffice.libro.download',$libro->bibliografia) }}" data-libro="{{ $libro->bibliografia->id }}" class="descargar-ajax btn btn-lg bg-primary waves-effect pull-right btn-upc" role="button">
                                         DESCARGAR
                                     </a>
                                 </div>
@@ -105,7 +105,7 @@
                         </div>
                     </div>
                     <div class="row clearfix">
-                        @if (Auth::user()->isAdmin() || Auth::user()->id == $libro->bibliografia->usuario->id || $libro->bibliografia->mensaje != null)
+                        @if (Auth::user()->isAdmin() || $libro->bibliografia->revisado == 2)
                         <div class="col-xs-12 ">
                             <div class="row clearfix">
                                 <div class="col-sm-12">

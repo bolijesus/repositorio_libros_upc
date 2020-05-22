@@ -65,7 +65,7 @@
                             </a>
                         @endif
                         <a href="{{ route('backoffice.libro.download',$libro->bibliografia) }}" class="col-xs-offset-1 btn btn-xs bg-green waves-effect">
-                            <i data-user="{{ \Auth::user()->id }}" class="material-icons descargar-ajax">file_download</i>
+                            <i data-libro="{{ $libro->bibliografia->id }}" class="material-icons descargar-ajax">file_download</i>
                         </a>
                         @if (\Auth::user()->isAdmin())
                             <a data-libro="{{ $libro->id }}" class="eliminar col-xs-offset-1 btn btn-xs bg-red waves-effect">

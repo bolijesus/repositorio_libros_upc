@@ -272,8 +272,17 @@ class LibroController extends Controller
 
     public function revision(Request $request, Libro $libro)
     {
+        if ($request->revisado != 3) {
+            $request->validate([
+                'contenido' => 'required'
+            ],
+            [
+                'contenido.required' => 'Porfavor especifique porque rechazo la bibliografia en el sistema'
+            ]);
+        }
         
-        $revision = $request->only('revisado')['revisado'];
+        $revision = $request->revisado;
+        $mensajeRevision = $request->contenido;
         
         $bibliografia = $libro->bibliografia;
         $enRevison = 1;
@@ -284,6 +293,18 @@ class LibroController extends Controller
         if ($revision == $noAceptado) {
             $bibliografia->revisado = $noAceptado;
             $mensaje = "'Archivo No aceptado', 'El archivo no se acepto en la plataforma', 'warning'";
+            if ($bibliografia->mensaje == null) {
+                $bibliografia->mensaje()->create([
+                    'emisor' => Auth::user()->id,
+                    'receptor' => $bibliografia->usuario->id,
+                    'contenido' => $mensajeRevision
+                    ]);
+            } else {
+                $bibliografia->mensaje->update([
+                    'contenido' => $mensajeRevision
+                ]);
+            }
+            $bibliografia->mensaje->save();
         }elseif ($revision == $revisado) {
             $bibliografia->revisado = $revisado;
             \asignarPuntos($libro->bibliografia);

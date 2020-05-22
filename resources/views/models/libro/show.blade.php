@@ -105,7 +105,7 @@
                         </div>
                     </div>
                     <div class="row clearfix">
-                        @if (Auth::user()->isAdmin() || Auth::user()->id == $libro->bibliografia->usuario->id )
+                        @if (Auth::user()->isAdmin() || Auth::user()->id == $libro->bibliografia->usuario->id || $libro->bibliografia->mensaje != null)
                         <div class="col-xs-12 ">
                             <div class="row clearfix">
                                 <div class="col-sm-12">
@@ -113,8 +113,10 @@
                                         <label for="titulo">Mensaje de revision</label>
                                         <small></small>
                                         <div class="form-line">
-                                            <textarea name="contenido" {{ ! Auth::user()->isAdmin()?'disabled':'' }} rows="4" class="form-control no-resize" placeholder="Descripcion...">{{ $libro->bibliografia->descripcion }}</textarea>
+                                            <textarea name="contenido" {{ ! Auth::user()->isAdmin()?'disabled':'' }} rows="4" class="form-control no-resize" placeholder="Descripcion...">{{ optional($libro->bibliografia->mensaje)->contenido }}</textarea>
                                         </div>
+                                        <label id="user_name-error" class="error">{{ $errors->first('contenido') }}</label>
+
                                     </div>
                                 </div>
                             </div>

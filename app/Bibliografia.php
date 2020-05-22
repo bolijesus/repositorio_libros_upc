@@ -38,6 +38,11 @@ class Bibliografia extends Model
         return $this->belongsToMany(Genero::class);
     }
 
+    public function mensaje()
+    {
+        return $this->hasOne(Mensaje::class);
+    }
+
     //METODOS
     public function hasAutor($autorToSearch)
     {

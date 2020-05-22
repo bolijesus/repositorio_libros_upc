@@ -13,6 +13,7 @@
 
 use App\Bibliografia;
 use App\Libro;
+use App\Revista;
 use App\Role;
 use App\User;
 use Carbon\Carbon;
@@ -36,8 +37,9 @@ Route::get('/demo',function ()
 
 Route::get('/', function () {
     $libros = Libro::all()->load(['bibliografia', 'bibliografia.usuario']);
+    $revistas = Revista::all()->load(['bibliografia', 'bibliografia.usuario']);
     
-    return view('frontoffice.templates.index', compact('libros'));
+    return view('frontoffice.templates.index', compact('libros','revistas'));
 });
 
 //BACK OFFICE
@@ -52,7 +54,12 @@ Route::name('backoffice.')->middleware('auth')->group(function (){
     Route::resource('/libro', 'LibroController');
     Route::get('/libro/download/{libro}','LibroController@download')->name('libro.download');
     Route::post('/libro/revision/{libro}', 'LibroController@revision')->name('libro.revision');
-    Route::post('/puntos/{libro}', 'LibroController@puntosActuales');
+    
+    Route::resource('/revista', 'RevistaController');
+    Route::get('/revista/download/{revista}','RevistaController@download')->name('revista.download');
+    Route::post('/revista/revision/{revista}', 'RevistaController@revision')->name('revista.revision');
+    
+    Route::post('/puntos', 'LibroController@puntosActuales');
 });
 Auth::routes(['register' => false]);
 

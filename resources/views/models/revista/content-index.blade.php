@@ -26,49 +26,49 @@
             </tr>
         </tfoot>
         <tbody>
-            @foreach ($libros as $libro)
+            @foreach ($revistas as $revista)
             <tr>
                 <td>
-                    <a href="{{ route('backoffice.libro.show', $libro) }}">
-                        {{ $libro->bibliografia->titulo }}
+                    <a href="{{ route('backoffice.revista.show', $revista) }}">
+                        {{ $revista->bibliografia->titulo }}
                     </a>
                 </td>
                 <td>
                     <ul>
-                        @foreach ($libro->bibliografia->autores as $autor)
+                        @foreach ($revista->bibliografia->autores as $autor)
                         <li>{{ $autor->nombre }}</li>
                         @endforeach
                     </ul>
                         
                 </td>
-                <td>{{ $libro->bibliografia->idioma }}</td>
+                <td>{{ $revista->bibliografia->idioma }}</td>
                 @if (\Auth::user()->isAdmin())
-                    <td>{{ $libro->bibliografia->usuario->usuario }}</td>
+                    <td>{{ $revista->bibliografia->usuario->usuario }}</td>
                 @endif
                 <td>
                     
-                        @if ($libro->bibliografia->revisado==3)
+                        @if ($revista->bibliografia->revisado==3)
                         <i class="material-icons col-green">check</i>
-                        @elseif ($libro->bibliografia->revisado==2)
+                        @elseif ($revista->bibliografia->revisado==2)
                         <i class="material-icons col-red">close</i>
                         @else
                         <i class="material-icons col-orange">sync</i>
                         @endif
                 <td>
                     <div class="row d-inline small clearfix">
-                        <a href="{{ route('backoffice.libro.show',$libro) }}" class="col-xs-offset-1 btn btn-xs bg-cyan waves-effect ">
+                        <a href="{{ route('backoffice.revista.show',$revista) }}" class="col-xs-offset-1 btn btn-xs bg-cyan waves-effect ">
                             <i class="large material-icons">remove_red_eye</i>
                         </a>
-                        @if ($libro->bibliografia->revisado != 3 || \Auth::user()->isAdmin())
-                            <a href="{{ route('backoffice.libro.edit',$libro) }}" class="col-xs-offset-1 btn btn-xs bg-orange waves-effect">
+                        @if ($revista->bibliografia->revisado != 3 || \Auth::user()->isAdmin())
+                            <a href="{{ route('backoffice.revista.edit',$revista) }}" class="col-xs-offset-1 btn btn-xs bg-orange waves-effect">
                                 <i class="material-icons ">mode_edit</i>
                             </a>
                         @endif
-                        <a href="{{ route('backoffice.libro.download',$libro->bibliografia) }}" class="col-xs-offset-1 btn btn-xs bg-green waves-effect">
-                            <i class="material-icons descargar-ajax">file_download</i>
+                        <a href="{{ route('backoffice.revista.download',$revista->bibliografia) }}" class="col-xs-offset-1 btn btn-xs bg-green waves-effect">
+                            <i  class="material-icons descargar-ajax">file_download</i>
                         </a>
                         @if (\Auth::user()->isAdmin())
-                            <a data-libro="{{ $libro->id }}" class="eliminar col-xs-offset-1 btn btn-xs bg-red waves-effect">
+                            <a data-revista="{{ $revista->id }}" class="eliminar col-xs-offset-1 btn btn-xs bg-red waves-effect">
                                 <i class="material-icons ">delete_forever</i>
                             </a>                                            
                         @endif

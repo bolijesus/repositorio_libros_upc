@@ -13,7 +13,7 @@
 @include('templates.layout.top_bar')         
 <!-- #Top Bar -->
     <section class="_content">
-        @include('frontoffice.templates.layout.content',['libros'=>$libros,'aceptado'=> 3])            
+        @include('frontoffice.templates.layout.content',['aceptado'=> 3])            
     </section>
 
  

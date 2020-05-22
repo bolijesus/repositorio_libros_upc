@@ -1,12 +1,13 @@
 <?php
+
 namespace App\Http\Controllers;
 
+use App\Revista;
 use App\Autor;
 use App\Bibliografia;
 use App\Genero;
-use App\Http\Requests\Libro\StoreRequest;
-use App\Http\Requests\Libro\UpdateRequest;
-use App\Libro;
+use App\Http\Requests\Revista\UpdateRequest;
+use App\Http\Requests\Revista\StoreRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -15,11 +16,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate as FacadesGate;
 use Illuminate\Support\Facades\Storage;
 
-class LibroController extends Controller
+class RevistaController extends Controller
 {
-    private $path='public/libros/';
+    private $path='public/revistas/';
     private $default_portada='public/portada.png';
-    private $path_image = 'public/imagenes/libros/';
+    private $path_image = 'public/imagenes/revistas/';
 
     /**
      * Display a listing of the resource.
@@ -30,13 +31,13 @@ class LibroController extends Controller
     {
         $usuario = \auth()->user();        
         if ($usuario->isAdmin()) {            
-            $libros = Libro::all()->load(['bibliografia','bibliografia.usuario','bibliografia.autores']);
+            $revistas = Revista::all()->load(['bibliografia','bibliografia.usuario','bibliografia.autores']);
         }else {
-            $bibliografias_libros = $usuario->bibliografias->where('bibliografiable_type',Libro::class);
-            $libros = \getChildModel($bibliografias_libros)->load(['bibliografia','bibliografia.usuario','bibliografia.autores']);
+            $bibliografias_revistas = $usuario->bibliografias->where('bibliografiable_type',Revista::class);
+            $revistas = \getChildModel($bibliografias_revistas)->load(['bibliografia','bibliografia.usuario','bibliografia.autores']);
         }
-        return \view('models.libro.index',\compact('libros'));
-        
+        return \view('models.revista.index',\compact('revistas'));
+
     }
 
     /**
@@ -45,10 +46,11 @@ class LibroController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {   
+    {
         $autores = Autor::all();
         $generos = Genero::all();
-        return \view('models.libro.create',['libro' => new Libro(), 'autores' => $autores, 'generos' => $generos]);
+        return \view('models.revista.create',['revista' => new Revista(), 'autores' => $autores, 'generos' => $generos]);
+
     }
 
     /**
@@ -59,30 +61,30 @@ class LibroController extends Controller
      */
     public function store(StoreRequest $request)
     {   
-        $libro=$request->only(['editorial', 'isbn']);                
+        $revista=$request->only(['publicador']);                
         $bibliografia = $this->storeFile($request);
         $autores = $request->autores;
         $generos = $request->generos;
         
         try {
-            DB::transaction(function()use($bibliografia, $libro, $autores, $generos){
-                $libro = Libro::create($libro);
+            DB::transaction(function()use($bibliografia, $revista, $autores, $generos){
+                $revista = Revista::create($revista);
                 $bibliografia = $this->storeImage($bibliografia, Auth::user());
-                $bibliografia=$bibliografia->except(['editorial', 'isbn', '_archivo']);
+                $bibliografia=$bibliografia->except(['publicador', '_archivo']);
                 
-                $bibliografia = $libro->bibliografia()->create($bibliografia);
+                $bibliografia = $revista->bibliografia()->create($bibliografia);
                 $bibliografia->autores()->sync($autores);
                 $bibliografia->generos()->sync($generos);
             },5);
         } catch (\Throwable $th) {
             dd($th);
-            return \redirect()->route('backoffice.libro.index')->with('alert',swal(
+            return \redirect()->route('backoffice.revista.index')->with('alert',swal(
                 "'ERROR en el sistema',
                 'No se pudo subir su archivo, por favor intente mas tarde',
                 'error'"
             ));
         }
-        return \redirect()->route('backoffice.libro.index')
+        return \redirect()->route('backoffice.revista.index')
         ->with('alert', \swal("
             'Archivo Subido!',
             'El archivo fue Cargado con exito',
@@ -92,46 +94,45 @@ class LibroController extends Controller
         
     }
 
-    
     /**
      * Display the specified resource.
      *
-     * @param  \App\Libro  $libro
+     * @param  \App\Revista  $revista
      * @return \Illuminate\Http\Response
      */
-    public function show(Libro $libro)
+    public function show(Revista $revista)
     {
-        $libro = $libro->load(['bibliografia', 'bibliografia.autores']);
-        return \view('models.libro.show',\compact('libro'));
+        $revista = $revista->load(['bibliografia', 'bibliografia.autores']);
+        return \view('models.revista.show',\compact('revista'));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Libro  $libro
+     * @param  \App\Revista  $revista
      * @return \Illuminate\Http\Response
      */
-    public function edit(Libro $libro)
+    public function edit(Revista $revista)
     {
-        FacadesGate::authorize('editar-libros', $libro);
+        FacadesGate::authorize('editar-revistas', $revista);
         $autores = Autor::all();
         $generos = Genero::all();
-        return \view('models.libro.edit',\compact('autores','libro','generos') );
+        return \view('models.revista.edit',\compact('autores','revista','generos') );
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Libro  $libro
+     * @param  \App\Revista  $revista
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateRequest $request, Libro $libro)
+    public function update(UpdateRequest $request, Revista $revista)
     {
-        FacadesGate::authorize('editar-libros', $libro);
-        $usuario = $libro->bibliografia->usuario;
-        $libro = $libro->load(['bibliografia','bibliografia.autores']);
-        $bibliografia = $libro->bibliografia;
+        FacadesGate::authorize('editar-revistas', $revista);
+        $usuario = $revista->bibliografia->usuario;
+        $revista = $revista->load(['bibliografia','bibliografia.autores']);
+        $bibliografia = $revista->bibliografia;
         if (\request()->has('_portada') && !($bibliografia->portada === $this->default_portada)) {
             Storage::delete($bibliografia->portada);
         }
@@ -139,33 +140,33 @@ class LibroController extends Controller
         $autores = $request->autores;
         $generos = $request->generos;
         try {
-            DB::transaction(function () use ($request, $libro, $autores, $generos)
+            DB::transaction(function () use ($request, $revista, $autores, $generos)
             {
                 if (request()->has('_archivo')) {
-                    Storage::delete($libro->bibliografia->archivo);               
-                    $request = $this->updateFile($request, $libro);
+                    Storage::delete($revista->bibliografia->archivo);               
+                    $request = $this->updateFile($request, $revista);
                 }  
 
-                if ( !Auth::user()->isAdmin() && $libro->bibliografia->revisado != 1 ) {
+                if ( !Auth::user()->isAdmin() && $revista->bibliografia->revisado != 1 ) {
                     $request = Arr::add($request,'revisado',1);
                 }
                   
-                $libro->bibliografia->update($request->except(['editorial','isbn']));                    
-                $libro->update($request->only(['editorial','isbn']));
-                $libro->bibliografia->autores()->sync($autores);
-                $libro->bibliografia->generos()->sync($generos);
+                $revista->bibliografia->update($request->except(['editorial','isbn']));                    
+                $revista->update($request->only(['editorial','isbn']));
+                $revista->bibliografia->autores()->sync($autores);
+                $revista->bibliografia->generos()->sync($generos);
             },5);
 
             // TODO::ordenar si en una funcion para guardar archivos y mensajes de swerAler
-            return \redirect()->route('backoffice.libro.index')->with('alert',\swal("
-                'Libro Atualizado',
-                'Se actualizo el libro satisfactoriamente',
+            return \redirect()->route('backoffice.revista.index')->with('alert',\swal("
+                'revista Atualizado',
+                'Se actualizo el revista satisfactoriamente',
                 'success'
             "));
             
         } catch (Throwable $th) {
-            return \redirect()->route('backoffice.libro.index')->with('alert',\swal("
-                'Libro NO Atualizado',
+            return \redirect()->route('backoffice.revista.index')->with('alert',\swal("
+                'revista NO Atualizado',
                 '(ERROR DEL SISTEMA) intentelo nuevamente',
                 'error'
             "));
@@ -176,22 +177,22 @@ class LibroController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Libro  $libro
+     * @param  \App\Revista  $revista
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Libro $libro)
+    public function destroy(Revista $revista)
     {
-        $libro = $libro->load(['bibliografia']);
+        $revista = $revista->load(['bibliografia']);
         if (\request()->ajax()) {
             try {
-                Storage::delete($libro->bibliografia->archivo);
-                if ($libro->bibliografia->portada != $this->default_portada) {
-                    Storage::delete($libro->bibliografia->portada);
+                Storage::delete($revista->bibliografia->archivo);
+                if ($revista->bibliografia->portada != $this->default_portada) {
+                    Storage::delete($revista->bibliografia->portada);
                 }
-                // $libro->bibliografia->user_id = null;
-                // $libro->bibliografia->save();
-                $libro->bibliografia->delete();
-                $libro->delete();
+                // $revista->bibliografia->user_id = null;
+                // $revista->bibliografia->save();
+                $revista->bibliografia->delete();
+                $revista->delete();
                 
                 return \json_encode(['respuesta'=>true]);
             } catch (\Throwable $th) {
@@ -199,7 +200,7 @@ class LibroController extends Controller
             }
         }
     }
-    
+
     //METODOS PROPIOS
     private function storeFile(Request $request)
     {   
@@ -214,9 +215,9 @@ class LibroController extends Controller
         
     }
 
-    private function updateFile(Request $request, $libro)
+    private function updateFile(Request $request, $revista)
     {   
-        $id_usuario = $libro->bibliografia->usuario->id;
+        $id_usuario = $revista->bibliografia->usuario->id;
         $request = $this->setFile($request, $id_usuario);        
         
         return $request;
@@ -227,12 +228,12 @@ class LibroController extends Controller
     {
         $archivo = $request->file('_archivo');
         $extencion = $archivo->clientExtension();        
-        $rutaLibro = $this->path.$id_usuario;
+        $rutaRevista = $this->path.$id_usuario;
         $nombre_a_guardar = str_replace(['-',' ',':'],'',Carbon::now());
-        \crearDirectorio($rutaLibro);
+        \crearDirectorio($rutaRevista);
         
         
-        $rutaGuardado = $request->file('_archivo')->storeAs($rutaLibro,$nombre_a_guardar.'.'.$extencion);
+        $rutaGuardado = $request->file('_archivo')->storeAs($rutaRevista,$nombre_a_guardar.'.'.$extencion);
         $request = Arr::add($request, 'archivo', $rutaGuardado);
 
         return $request;
@@ -272,7 +273,7 @@ class LibroController extends Controller
         return Storage::download($bibliografia->archivo);
     }
 
-    public function revision(Request $request, Libro $libro)
+    public function revision(Request $request, Revista $revista)
     {
         if ($request->revisado != 3) {
             $request->validate([
@@ -286,7 +287,7 @@ class LibroController extends Controller
         $revision = $request->revisado;
         $mensajeRevision = $request->contenido;
         
-        $bibliografia = $libro->bibliografia;
+        $bibliografia = $revista->bibliografia;
         $enRevison = 1;
         $noAceptado = 2;
         $revisado = 3;
@@ -308,7 +309,7 @@ class LibroController extends Controller
             }
         }elseif ($revision == $revisado) {
             $bibliografia->revisado = $revisado;
-            \asignarPuntos($libro->bibliografia);
+            \asignarPuntos($revista->bibliografia);
             $mensaje = "'Archivo aceptado', 'El archivo se acepto en la plataforma', 'success'";
             
         } else {
@@ -316,14 +317,14 @@ class LibroController extends Controller
         }
         
         $bibliografia->save();
-        return \redirect()->route('backoffice.libro.index')->with('alert',swal($mensaje));
+        return \redirect()->route('backoffice.revista.index')->with('alert',swal($mensaje));
     }
 
-    public function puntosActuales()
-    {       
+    public function puntosActuales($bibliografia)
+    {
+        $bibliografia = Bibliografia::findOrFail($bibliografia);
         if (\request()->ajax()) {
-            return Auth::user()->puntos_descarga;
+            return Auth::user()->puntos_actuales;
         }
     }
-     
 }

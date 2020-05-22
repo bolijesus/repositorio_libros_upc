@@ -119,6 +119,24 @@
                     </li>
                 </ul>
             </li>
+            <li class="{{ active('backoffice.revista.*') }}">
+                <a href="#" class="menu-toggle">
+                    <i class="material-icons">layers</i>
+                    <span>Revistas</span>
+                </a>
+                <ul class="ml-menu">
+                    <li class="{{ active('backoffice.revista.index') }}">
+                        <a href="{{ route('backoffice.revista.index') }}">
+                            <span>Listar</span>
+                        </a>
+                    </li>
+                    <li class="{{ active('backoffice.revista.create') }}">
+                        <a href="{{ route('backoffice.revista.create') }}">
+                            <span>Subir</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
         </ul>
     </div>
     <!-- #Menu -->

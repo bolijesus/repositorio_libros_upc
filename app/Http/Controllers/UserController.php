@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Bibliografia;
 use App\Http\Requests\User\StoreRequest;
 use App\Http\Requests\User\UpdateRequest;
 use App\Libro;
+use App\Revista;
 use App\Role;
 use App\User;
 use Illuminate\Support\Arr;
@@ -96,11 +98,15 @@ class UserController extends Controller
     public function show(User $user)
     {
         $this->authorize('view', $user);
-        $bibliografias = $user->bibliografias->where('bibliografiable_type',Libro::class)
+        $libros = $user->bibliografias->where('bibliografiable_type',Libro::class)
         ->load('bibliografiable');        
-        $libros = \getChildModel($bibliografias)->load(['bibliografia','bibliografia.usuario']);
-   
-        return \view('models.user.show',\compact('user', 'libros'));
+        $revistas = $user->bibliografias->where('bibliografiable_type',Revista::class)
+        ->load('bibliografiable'); 
+        
+        $libros = \getChildModel($libros)->load(['bibliografia','bibliografia.usuario']);
+        $revistas = \getChildModel($revistas)->load(['bibliografia','bibliografia.usuario']);
+        
+        return \view('models.user.show',\compact('user', 'libros','revistas'));
     }
 
     /**

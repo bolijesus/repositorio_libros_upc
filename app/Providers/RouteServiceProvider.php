@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Revista;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +33,7 @@ class RouteServiceProvider extends ServiceProvider
         //
 
         parent::boot();
+        Route::model('revistum', Revista::class);
     }
 
     /**

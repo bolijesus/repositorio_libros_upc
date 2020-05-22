@@ -1,6 +1,6 @@
 
 $(document).ready(function() {
-    $('.selects-form-libros').select2({
+    $('.selects-form-bibliografia').select2({
         width: '100%'
     });
 });

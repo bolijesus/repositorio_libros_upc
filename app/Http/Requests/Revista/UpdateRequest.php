@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Libro;
+namespace App\Http\Requests\Revista;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -28,8 +28,7 @@ class UpdateRequest extends FormRequest
             'idioma' => 'required',
             'generos' => 'required',
             'autores' => 'required',
-            'editorial' => 'required',
-            'isbn' => 'required|numeric',
+            'publicador' => 'required',
             '_archivo' => 'file',
             'descripcion' => 'required|max:200',
             '_portada' => 'image|dimensions:min_width=128,min_height=128',

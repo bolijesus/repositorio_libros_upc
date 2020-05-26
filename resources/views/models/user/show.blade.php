@@ -38,16 +38,16 @@
                 <div class="profile-footer">
                     <ul>
                         <li>
-                            <span>Libros Aprovados</span>
-                            <span>{{ $user->bibliografias->where('revisado','=','3')->count() }}</span>
+                            <span>Libros subidos</span>
+                            <span>{{ $user->bibliografias->where('bibliografiable_type','=','App\Libro')->count() }}</span>
                         </li>
                         <li>
-                            <span>Revistas</span>
-                            <span>1.201(estatico)</span>
+                            <span>Revistas subidas</span>
+                            <span>{{ $user->bibliografias->where('bibliografiable_type','=', 'App\Revista')->count() }}</span>
                         </li>
                         <li>
-                            <span>Tesis</span>
-                            <span>14.252(estatico)</span>
+                            <span>Tesis subidas</span>
+                            <span>{{ $user->bibliografias->where('bibliografiable_type','=','App\Tesis')->count() }}</span>
                         </li>
                     </ul>
                     <a href="{{ route('backoffice.user.edit',$user) }}" class="btn btn-upc btn-lg waves-effect btn-block">EDITAR PERFIL</a>
@@ -61,16 +61,19 @@
                     <div>
                         <ul class="nav nav-tabs" role="tablist">
                             <li role="presentation" class="active"><a href="#libros" aria-controls="libros" role="tab" data-toggle="tab">Libros</a></li>
-                            <li role="presentation"><a href="#profile_settings" aria-controls="settings" role="tab" data-toggle="tab">Revistas</a></li>
-                            <li role="presentation"><a href="#change_password_settings" aria-controls="settings" role="tab" data-toggle="tab">Tesis</a></li>
+                            <li role="presentation"><a href="#revistas" aria-controls="revistas" role="tab" data-toggle="tab">Revistas</a></li>
+                            <li role="presentation"><a href="#tesis" aria-controls="tesis" role="tab" data-toggle="tab">Tesis</a></li>
                         </ul>
 
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane fade in active" id="libros">
                                 @include('models.libro.content-index',['libros' => $libros])
                             </div>
-                            <div role="tabpanel" class="tab-pane fade in" id="profile_settings">
+                            <div role="tabpanel" class="tab-pane fade in" id="revistas">
                                 @include('models.revista.content-index',['revistas' => $revistas])
+                            </div>
+                            <div role="tabpanel" class="tab-pane fade in" id="tesis">
+                                @include('models.tesis.content-index',['tesis' => $tesis])
                             </div>
                         </div>
                     </div>

@@ -15,6 +15,7 @@ use App\Bibliografia;
 use App\Libro;
 use App\Revista;
 use App\Role;
+use App\Tesis;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -38,8 +39,9 @@ Route::get('/demo',function ()
 Route::get('/', function () {
     $libros = Libro::all()->load(['bibliografia', 'bibliografia.usuario']);
     $revistas = Revista::all()->load(['bibliografia', 'bibliografia.usuario']);
+    $tesis = Tesis::all()->load(['bibliografia', 'bibliografia.usuario']);
     
-    return view('frontoffice.templates.index', compact('libros','revistas'));
+    return view('frontoffice.templates.index', compact('libros','revistas','tesis'));
 });
 
 //BACK OFFICE
@@ -58,6 +60,10 @@ Route::name('backoffice.')->middleware('auth')->group(function (){
     Route::resource('/revista', 'RevistaController');
     Route::get('/revista/download/{revista}','RevistaController@download')->name('revista.download');
     Route::post('/revista/revision/{revista}', 'RevistaController@revision')->name('revista.revision');
+    
+    Route::resource('/tesis', 'TesisController');
+    Route::get('/tesis/download/{tesis}','TesisController@download')->name('tesis.download');
+    Route::post('/tesis/revision/{tesis}', 'TesisController@revision')->name('tesis.revision');
     
     Route::post('/puntos', 'LibroController@puntosActuales');
 });

@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Revista;
+use App\Tesis;
 use App\Autor;
 use App\Bibliografia;
 use App\Genero;
-use App\Http\Requests\Revista\UpdateRequest;
-use App\Http\Requests\Revista\StoreRequest;
+use App\Http\Requests\Tesis\UpdateRequest;
+use App\Http\Requests\Tesis\StoreRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -16,11 +16,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate as FacadesGate;
 use Illuminate\Support\Facades\Storage;
 
-class RevistaController extends Controller
+class TesisController extends Controller
 {
-    private $path='public/revistas/';
+    private $path='public/tesis/';
     private $default_portada='public/portada.png';
-    private $path_image = 'public/imagenes/revistas/';
+    private $path_image = 'public/imagenes/tesis/';
 
     /**
      * Display a listing of the resource.
@@ -31,12 +31,12 @@ class RevistaController extends Controller
     {
         $usuario = \auth()->user();        
         if ($usuario->isAdmin()) {            
-            $revistas = Revista::all()->load(['bibliografia','bibliografia.usuario','bibliografia.autores']);
+            $tesis = Tesis::all()->load(['bibliografia','bibliografia.usuario','bibliografia.autores']);
         }else {
-            $bibliografias_revistas = $usuario->bibliografias->where('bibliografiable_type',Revista::class);
-            $revistas = \getChildModel($bibliografias_revistas)->load(['bibliografia','bibliografia.usuario','bibliografia.autores']);
+            $bibliografias_tesis = $usuario->bibliografias->where('bibliografiable_type',Tesis::class);
+            $tesis = \getChildModel($bibliografias_tesis)->load(['bibliografia','bibliografia.usuario','bibliografia.autores']);
         }
-        return \view('models.revista.index',\compact('revistas'));
+        return \view('models.tesis.index',\compact('tesis'));
 
     }
 
@@ -49,7 +49,7 @@ class RevistaController extends Controller
     {
         $autores = Autor::all();
         $generos = Genero::all();
-        return \view('models.revista.create',['revista' => new Revista(), 'autores' => $autores, 'generos' => $generos]);
+        return \view('models.tesis.create',['tesis' => new Tesis(), 'autores' => $autores, 'generos' => $generos]);
 
     }
 
@@ -61,30 +61,30 @@ class RevistaController extends Controller
      */
     public function store(StoreRequest $request)
     {   
-        $revista=$request->only(['publicador']);                
+        $tesis=$request->only(['publicadores']);                
         $bibliografia = $this->storeFile($request);
         $autores = $request->autores;
         $generos = $request->generos;
         
         try {
-            DB::transaction(function()use($bibliografia, $revista, $autores, $generos){
-                $revista = Revista::create($revista);
+            DB::transaction(function()use($bibliografia, $tesis, $autores, $generos){
+                $tesis = Tesis::create($tesis);
                 $bibliografia = $this->storeImage($bibliografia, Auth::user());
-                $bibliografia=$bibliografia->except(['publicador', '_archivo']);
+                $bibliografia=$bibliografia->except(['publicadores', '_archivo']);
                 
-                $bibliografia = $revista->bibliografia()->create($bibliografia);
+                $bibliografia = $tesis->bibliografia()->create($bibliografia);
                 $bibliografia->autores()->sync($autores);
                 $bibliografia->generos()->sync($generos);
             },5);
         } catch (\Throwable $th) {
             dd($th);
-            return \redirect()->route('backoffice.revista.index')->with('alert',swal(
+            return \redirect()->route('backoffice.tesis.index')->with('alert',swal(
                 "'ERROR en el sistema',
                 'No se pudo subir su archivo, por favor intente mas tarde',
                 'error'"
             ));
         }
-        return \redirect()->route('backoffice.revista.index')
+        return \redirect()->route('backoffice.tesis.index')
         ->with('alert', \swal("
             'Archivo Subido!',
             'El archivo fue Cargado con exito',
@@ -97,42 +97,42 @@ class RevistaController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Revista  $revista
+     * @param  \App\Tesis  $tesis
      * @return \Illuminate\Http\Response
      */
-    public function show(Revista $revista)
+    public function show(Tesis $tesis)
     {
-        $revista = $revista->load(['bibliografia', 'bibliografia.autores']);
-        return \view('models.revista.show',\compact('revista'));
+        $tesis = $tesis->load(['bibliografia', 'bibliografia.autores']);
+        return \view('models.tesis.show',\compact('tesis'));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Revista  $revista
+     * @param  \App\Tesis  $tesis
      * @return \Illuminate\Http\Response
      */
-    public function edit(Revista $revista)
+    public function edit(Tesis $tesis)
     {
-        FacadesGate::authorize('editar-revistas', $revista);
+        FacadesGate::authorize('editar-tesis', $tesis);
         $autores = Autor::all();
         $generos = Genero::all();
-        return \view('models.revista.edit',\compact('autores','revista','generos') );
+        return \view('models.tesis.edit',\compact('autores','tesis','generos') );
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Revista  $revista
+     * @param  \App\Tesis  $tesis
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateRequest $request, Revista $revista)
+    public function update(UpdateRequest $request, Tesis $tesis)
     {
-        FacadesGate::authorize('editar-revistas', $revista);
-        $usuario = $revista->bibliografia->usuario;
-        $revista = $revista->load(['bibliografia','bibliografia.autores']);
-        $bibliografia = $revista->bibliografia;
+        FacadesGate::authorize('editar-tesis', $tesis);
+        $usuario = $tesis->bibliografia->usuario;
+        $tesis = $tesis->load(['bibliografia','bibliografia.autores']);
+        $bibliografia = $tesis->bibliografia;
         if (\request()->has('_portada') && !($bibliografia->portada === $this->default_portada)) {
             Storage::delete($bibliografia->portada);
         }
@@ -140,33 +140,33 @@ class RevistaController extends Controller
         $autores = $request->autores;
         $generos = $request->generos;
         try {
-            DB::transaction(function () use ($request, $revista, $autores, $generos)
+            DB::transaction(function () use ($request, $tesis, $autores, $generos)
             {
                 if (request()->has('_archivo')) {
-                    Storage::delete($revista->bibliografia->archivo);               
-                    $request = $this->updateFile($request, $revista);
+                    Storage::delete($tesis->bibliografia->archivo);               
+                    $request = $this->updateFile($request, $tesis);
                 }  
 
-                if ( !Auth::user()->isAdmin() && $revista->bibliografia->revisado != 1 ) {
+                if ( !Auth::user()->isAdmin() && $tesis->bibliografia->revisado != 1 ) {
                     $request = Arr::add($request,'revisado',1);
                 }
                   
-                $revista->bibliografia->update($request->except(['publicador']));                    
-                $revista->update($request->only(['publicador']));
-                $revista->bibliografia->autores()->sync($autores);
-                $revista->bibliografia->generos()->sync($generos);
+                $tesis->bibliografia->update($request->except(['publicadores']));                    
+                $tesis->update($request->only(['publicadores']));
+                $tesis->bibliografia->autores()->sync($autores);
+                $tesis->bibliografia->generos()->sync($generos);
             },5);
 
             // TODO::ordenar si en una funcion para guardar archivos y mensajes de swerAler
-            return \redirect()->route('backoffice.revista.index')->with('alert',\swal("
-                'revista Atualizado',
-                'Se actualizo la revista satisfactoriamente',
+            return \redirect()->route('backoffice.tesis.index')->with('alert',\swal("
+                'tesis Atualizado',
+                'Se actualizo la tesis satisfactoriamente',
                 'success'
             "));
             
         } catch (Throwable $th) {
-            return \redirect()->route('backoffice.revista.index')->with('alert',\swal("
-                'revista NO Atualizado',
+            return \redirect()->route('backoffice.tesis.index')->with('alert',\swal("
+                'tesis NO Atualizado',
                 '(ERROR DEL SISTEMA) intentelo nuevamente',
                 'error'
             "));
@@ -177,22 +177,22 @@ class RevistaController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Revista  $revista
+     * @param  \App\Tesis  $tesis
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Revista $revista)
+    public function destroy(Tesis $tesis)
     {
-        $revista = $revista->load(['bibliografia']);
+        $tesis = $tesis->load(['bibliografia']);
         if (\request()->ajax()) {
             try {
-                Storage::delete($revista->bibliografia->archivo);
-                if ($revista->bibliografia->portada != $this->default_portada) {
-                    Storage::delete($revista->bibliografia->portada);
+                Storage::delete($tesis->bibliografia->archivo);
+                if ($tesis->bibliografia->portada != $this->default_portada) {
+                    Storage::delete($tesis->bibliografia->portada);
                 }
-                // $revista->bibliografia->user_id = null;
-                // $revista->bibliografia->save();
-                $revista->bibliografia->delete();
-                $revista->delete();
+                // $tesis->bibliografia->user_id = null;
+                // $tesis->bibliografia->save();
+                $tesis->bibliografia->delete();
+                $tesis->delete();
                 
                 return \json_encode(['respuesta'=>true]);
             } catch (\Throwable $th) {
@@ -215,9 +215,9 @@ class RevistaController extends Controller
         
     }
 
-    private function updateFile(Request $request, $revista)
+    private function updateFile(Request $request, $tesis)
     {   
-        $id_usuario = $revista->bibliografia->usuario->id;
+        $id_usuario = $tesis->bibliografia->usuario->id;
         $request = $this->setFile($request, $id_usuario);        
         
         return $request;
@@ -228,12 +228,12 @@ class RevistaController extends Controller
     {
         $archivo = $request->file('_archivo');
         $extencion = $archivo->clientExtension();        
-        $rutaRevista = $this->path.$id_usuario;
+        $rutaTesis = $this->path.$id_usuario;
         $nombre_a_guardar = str_replace(['-',' ',':'],'',Carbon::now());
-        \crearDirectorio($rutaRevista);
+        \crearDirectorio($rutaTesis);
         
         
-        $rutaGuardado = $request->file('_archivo')->storeAs($rutaRevista,$nombre_a_guardar.'.'.$extencion);
+        $rutaGuardado = $request->file('_archivo')->storeAs($rutaTesis,$nombre_a_guardar.'.'.$extencion);
         $request = Arr::add($request, 'archivo', $rutaGuardado);
 
         return $request;
@@ -250,7 +250,7 @@ class RevistaController extends Controller
         }
 
         return $request;
-    }    
+    }
 
     public function download($bibliografia)
     {
@@ -273,7 +273,7 @@ class RevistaController extends Controller
         return Storage::download($bibliografia->archivo);
     }
 
-    public function revision(Request $request, Revista $revista)
+    public function revision(Request $request, Tesis $tesis)
     {
         if ($request->revisado != 3) {
             $request->validate([
@@ -287,7 +287,7 @@ class RevistaController extends Controller
         $revision = $request->revisado;
         $mensajeRevision = $request->contenido;
         
-        $bibliografia = $revista->bibliografia;
+        $bibliografia = $tesis->bibliografia;
         $enRevison = 1;
         $noAceptado = 2;
         $revisado = 3;
@@ -309,7 +309,7 @@ class RevistaController extends Controller
             }
         }elseif ($revision == $revisado) {
             $bibliografia->revisado = $revisado;
-            \asignarPuntos($revista->bibliografia);
+            \asignarPuntos($tesis->bibliografia);
             $mensaje = "'Archivo aceptado', 'El archivo se acepto en la plataforma', 'success'";
             
         } else {
@@ -317,7 +317,7 @@ class RevistaController extends Controller
         }
         
         $bibliografia->save();
-        return \redirect()->route('backoffice.revista.index')->with('alert',swal($mensaje));
+        return \redirect()->route('backoffice.tesis.index')->with('alert',swal($mensaje));
     }
 
     public function puntosActuales($bibliografia)

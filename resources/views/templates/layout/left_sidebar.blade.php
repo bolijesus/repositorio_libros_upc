@@ -137,6 +137,24 @@
                     </li>
                 </ul>
             </li>
+            <li class="{{ active('backoffice.tesis.*') }}">
+                <a href="#" class="menu-toggle">
+                    <i class="material-icons">assignment</i>
+                    <span>Tesis</span>
+                </a>
+                <ul class="ml-menu">
+                    <li class="{{ active('backoffice.tesis.index') }}">
+                        <a href="{{ route('backoffice.tesis.index') }}">
+                            <span>Listar</span>
+                        </a>
+                    </li>
+                    <li class="{{ active('backoffice.tesis.create') }}">
+                        <a href="{{ route('backoffice.tesis.create') }}">
+                            <span>Subir</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
         </ul>
     </div>
     <!-- #Menu -->

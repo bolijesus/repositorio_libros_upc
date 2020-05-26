@@ -8,6 +8,7 @@ use App\Http\Requests\User\UpdateRequest;
 use App\Libro;
 use App\Revista;
 use App\Role;
+use App\Tesis;
 use App\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -102,11 +103,14 @@ class UserController extends Controller
         ->load('bibliografiable');        
         $revistas = $user->bibliografias->where('bibliografiable_type',Revista::class)
         ->load('bibliografiable'); 
+        $tesis = $user->bibliografias->where('bibliografiable_type',Tesis::class)
+        ->load('bibliografiable'); 
         
         $libros = \getChildModel($libros)->load(['bibliografia','bibliografia.usuario']);
         $revistas = \getChildModel($revistas)->load(['bibliografia','bibliografia.usuario']);
+        $tesis = \getChildModel($tesis)->load(['bibliografia','bibliografia.usuario']);
         
-        return \view('models.user.show',\compact('user', 'libros','revistas'));
+        return \view('models.user.show',\compact('user', 'libros','revistas', 'tesis'));
     }
 
     /**

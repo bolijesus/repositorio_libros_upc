@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Libro;
 use App\Policies\UserPolicy;
 use App\Revista;
+use App\Tesis;
 use App\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -35,6 +36,9 @@ class AuthServiceProvider extends ServiceProvider
         });
         Gate::define('editar-revistas', function (User $user, Revista $revistaUsuario) {
             return $user->isAdmin() || ($user->id == $revistaUsuario->bibliografia->usuario->id);
+        });
+        Gate::define('editar-tesis', function (User $user, Tesis $tesisUsuario) {
+            return $user->isAdmin() || ($user->id == $tesisUsuario->bibliografia->usuario->id);
         });
     
     }

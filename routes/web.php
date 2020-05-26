@@ -51,7 +51,7 @@ Route::name('backoffice.')->middleware('auth')->group(function (){
     Route::resource('/user', 'UserController');
     Route::resource('/autor', 'AutorController');
     Route::resource('/genero', 'GeneroController');
-    
+    Route::get('/index','ReporteController@reportes')->name('index');
 
     Route::resource('/libro', 'LibroController');
     Route::get('/libro/download/{libro}','LibroController@download')->name('libro.download');

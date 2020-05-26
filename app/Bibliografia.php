@@ -43,6 +43,11 @@ class Bibliografia extends Model
         return $this->hasOne(Mensaje::class);
     }
 
+    public function reporte()
+    {
+        return $this->hasOne(Reporte::class);
+    }
+
     //METODOS
     public function hasAutor($autorToSearch)
     {

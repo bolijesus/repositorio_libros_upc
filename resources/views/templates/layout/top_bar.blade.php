@@ -31,7 +31,7 @@
                     </li>
                     <li class="pull-right">
                     
-                        <a href="{{ route('backoffice.user.show',\Auth::user()) }}" class="lg-outer _btn btn bg-white col-black waves-effect waves-green ">
+                        <a href="{{ route('backoffice.index')}}" class="lg-outer _btn btn bg-white col-black waves-effect waves-green ">
                             DASHBOARD
                         </a>   
                     </li>

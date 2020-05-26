@@ -102,6 +102,16 @@ class TesisController extends Controller
      */
     public function show(Tesis $tesis)
     {
+        if (Auth::user()->id != $tesis->bibliografia->usuario->id) {
+            if ($tesis->bibliografia->reporte == null) {
+                $tesis->bibliografia->reporte()->create(['vistas' => 1]);            
+            }else{
+               $vistas = $tesis->bibliografia->reporte->vistas; 
+               $vistas++;
+               $tesis->bibliografia->reporte()->update(['vistas' => $vistas]);
+               
+            }
+        }
         $tesis = $tesis->load(['bibliografia', 'bibliografia.autores']);
         return \view('models.tesis.show',\compact('tesis'));
     }
@@ -255,6 +265,16 @@ class TesisController extends Controller
     public function download($bibliografia)
     {
         $bibliografia = Bibliografia::findOrFail($bibliografia);
+        if (Auth::user()->id != $bibliografia->usuario->id) {
+            if ($bibliografia->reporte == null) {
+                $bibliografia->reporte()->create(['descarga' => 1]);            
+            }else{
+               $descarga = $bibliografia->reporte->descarga; 
+               $descarga++;
+               $bibliografia->reporte()->update(['descarga' => $descarga]);
+               
+            }
+        }
         $usuario = Auth::user();
         $puntosDescargaActuales = $usuario->puntos_descarga;
         if ($puntosDescargaActuales<=0) {

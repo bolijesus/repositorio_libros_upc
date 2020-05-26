@@ -102,6 +102,17 @@ class LibroController extends Controller
     public function show(Libro $libro)
     {
         $libro = $libro->load(['bibliografia', 'bibliografia.autores']);
+        if (Auth::user()->id != $libro->bibliografia->usuario->id) {
+        
+            if ($libro->bibliografia->reporte == null) {
+                $libro->bibliografia->reporte()->create(['vistas' => 1]);            
+            }else{
+               $vistas = $libro->bibliografia->reporte->vistas; 
+               $vistas++;
+               $libro->bibliografia->reporte()->update(['vistas' => $vistas]);
+               
+            }
+        }
         return \view('models.libro.show',\compact('libro'));
     }
 
@@ -254,6 +265,16 @@ class LibroController extends Controller
     public function download($bibliografia)
     {
         $bibliografia = Bibliografia::findOrFail($bibliografia);
+        if (Auth::user()->id != $bibliografia->usuario->id) {
+            if ($bibliografia->reporte == null) {
+                $bibliografia->reporte()->create(['descarga' => 1]);            
+            }else{
+               $descarga = $bibliografia->reporte->descarga; 
+               $descarga++;
+               $bibliografia->reporte()->update(['descarga' => $descarga]);
+               
+            }
+        }
         $usuario = Auth::user();
         $puntosDescargaActuales = $usuario->puntos_descarga;
         if ($puntosDescargaActuales<=0) {

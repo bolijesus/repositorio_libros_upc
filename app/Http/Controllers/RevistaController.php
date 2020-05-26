@@ -102,6 +102,16 @@ class RevistaController extends Controller
      */
     public function show(Revista $revista)
     {
+        if (Auth::user()->id != $revista->bibliografia->usuario->id) {
+            if ($revista->bibliografia->reporte == null) {
+                $revista->bibliografia->reporte()->create(['vistas' => 1]);            
+            }else{
+               $vistas = $revista->bibliografia->reporte->vistas; 
+               $vistas++;
+               $revista->bibliografia->reporte()->update(['vistas' => $vistas]);
+               
+            }
+        }
         $revista = $revista->load(['bibliografia', 'bibliografia.autores']);
         return \view('models.revista.show',\compact('revista'));
     }
@@ -255,6 +265,17 @@ class RevistaController extends Controller
     public function download($bibliografia)
     {
         $bibliografia = Bibliografia::findOrFail($bibliografia);
+        if (Auth::user()->id != $bibliografia->usuario->id) {
+        
+            if ($bibliografia->reporte == null) {
+                $bibliografia->reporte()->create(['descarga' => 1]);            
+            }else{
+               $descarga = $bibliografia->reporte->descarga; 
+               $descarga++;
+               $bibliografia->reporte()->update(['descarga' => $descarga]);
+               
+            }
+        }
         $usuario = Auth::user();
         $puntosDescargaActuales = $usuario->puntos_descarga;
         if ($puntosDescargaActuales<=0) {

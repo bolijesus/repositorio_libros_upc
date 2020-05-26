@@ -27,6 +27,12 @@
     <div class="menu">
         
         <ul class="list">
+            <li class="{{ active('backoffice.index') }}">
+                <a href="{{ route('backoffice.index') }}" class="menu-toggle">
+                    <i class="material-icons">dashboard</i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
             @if (\Auth::user()->isAdmin())
                 <li class="{{ active('backoffice.role.*') }}">
                     <a href="#" class="menu-toggle">

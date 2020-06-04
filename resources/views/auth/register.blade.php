@@ -1,77 +1,117 @@
-@extends('layouts.app')
+@extends('templates.index')
+
+@section('title','LogIn')
+
+@section('css')
+    {{-- <link rel="stylesheet" href="style.css"> --}}
+@endsection
+
+{{-- SECCION PARA CAMBIAR LA CLASE DE LA ETIQUETA BODY PARA EL INICIO DE SESION --}}
+@section('type_page','login-page bg-light-green') 
+
+{{-- breadcrumbs --}}
+
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Register') }}</div>
+<div class="login-box">
+    <div class="logo">
+        <a href="javascript:void(0);">Repositorio | <b>UPC</b></a>
+        <small>Repositorio bibliografico | Universidad Popular del Cesar</small>
+    </div>
+    <div class="card">
+        <div class="body">
+            <form id="sign_up" method="POST" action="{{ route('register') }}">
+                @csrf
+                <div class="msg">Registrarse como nuevo usuario</div>
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <i class="material-icons">person</i>
+                    </span>
+                    <div class="form-line">
+                        <input type="text" class="form-control" name="nombre" value="{{ old('nombre') }}" placeholder="Nombres" autofocus>
+                    </div>
+                    <label id="user_name-error" class="error" for="user_name">{{ $errors->first('nombre') }}</label>
 
-                <div class="card-body">
-                    <form method="POST" action="{{ route('register') }}">
-                        @csrf
+                    <div class="form-line">
+                        <input type="text" class="form-control" name="apellido" value="{{ old('apellido') }}" placeholder="Apellidos" autofocus>
+                    </div>
+                    <label id="user_name-error" class="error" for="user_name">{{ $errors->first('apellido') }}</label>
 
-                        <div class="form-group row">
-                            <label for="name" class="col-md-4 col-form-label text-md-right">{{ __('Name') }}</label>
+                    <div class="form-line">
+                        <input type="text" class="form-control" name="usuario" value="{{ old('usuario') }}" placeholder="Usuario del sistema" autofocus>
+                    </div>
+                    <label id="user_name-error" class="error" for="user_name">{{ $errors->first('usuario') }}</label>
 
-                            <div class="col-md-6">
-                                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus>
-
-                                @error('name')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email">
-
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
-
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="password-confirm" class="col-md-4 col-form-label text-md-right">{{ __('Confirm Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Register') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
                 </div>
-            </div>
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <i class="material-icons">email</i>
+                    </span>
+                    <div class="form-line">
+                        <input type="email" class="form-control" name="email" value="{{ old('email') }}" placeholder="Correo Electronico">
+                    </div>
+                    <label id="user_name-error" class="error" for="user_name">{{ $errors->first('email') }}</label>
+
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <i class="material-icons">lock</i>
+                    </span>
+                    <div class="form-line">
+                        <input type="password" class="form-control" name="password" placeholder="Contraseña">
+                    </div>
+                    <label id="user_name-error" class="error" for="user_name">{{ $errors->first('password') }}</label>
+
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <i class="material-icons">lock</i>
+                    </span>
+                    <div class="form-line">
+                        <input type="password" class="form-control" name="password_confirmation"  placeholder="confirmacion de la contraseña">
+                    </div>
+                    <label id="user_name-error" class="error" for="user_name">{{ $errors->first('password_confirm') }}</label>
+
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <i class="material-icons">pin_drop</i>
+                    </span>
+                    <div class="form-line">
+                        <input type="text" class="form-control" name="direccion" value="{{ old('direccion') }}"  placeholder="Direccion">
+                    </div>
+                    <label id="user_name-error" class="error" for="user_name">{{ $errors->first('direccion') }}</label>
+
+                </div>
+
+                <div class="form-group form-float">
+                    <div class="row clearfix">
+            
+                        <select class="form-control show-tick" name="sexo">
+                            <option value="">-- Sexo --</option>
+                            <option value="0">Masculino</option>
+                            <option value="1">Femenino</option>
+                        </select>
+            
+                    </div>
+                    <label id="user_name-error" class="error" for="user_name">{{ $errors->first('sexo') }}</label>
+
+                </div>
+
+                <button class="btn btn-block btn-upc col-white waves-effect" type="submit">REGISTRARSE</button>
+
+                <div class="m-t-25 m-b--5 align-center">
+                    <a class="col-green" href="{{ route('login') }}">Ya estoy registrado?</a>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+@endsection
+
+
+@section('scripts')
+    <!-- Validation Plugin Js -->
+    <script src="{{ asset('js/jquery-validation/jquery.validate.js') }}"></script>
+
 @endsection

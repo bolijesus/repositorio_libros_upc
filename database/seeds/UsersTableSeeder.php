@@ -28,6 +28,7 @@ class UsersTableSeeder extends Seeder
             'apellido'=>'bolivar',
             'usuario'=>'bolijesus98',
             'email'=>'bolijesus98@gmail.com',
+            'verificado'=>true,
             'password'=>bcrypt('1234'),
             'direccion'=>'sicarare',
             'sexo'=>0

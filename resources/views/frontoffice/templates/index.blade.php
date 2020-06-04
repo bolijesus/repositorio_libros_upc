@@ -7,7 +7,7 @@
         @include('templates.layout.loader')
     <!-- #Loader -->
 
-{{-- @include('templates.layout.search_bar') --}}
+@include('templates.layout.search_bar')
 
 <!-- Top Bar -->
 @include('templates.layout.top_bar')         

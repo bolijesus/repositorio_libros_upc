@@ -28,14 +28,28 @@ class ReporteController extends Controller
         $revision = $bibliografias->load('reporte')->where('revisado', '=', 1)->count();
         
         $libros = new Collection([
+            'cantidad' => $bibliografias->where('bibliografiable_type', '=', Libro::class)->count(),
+            'aceptado' => $bibliografias->where('bibliografiable_type', '=', Libro::class)->where('revisado', '=', 3)->count(),
+            'rechazado' => $bibliografias->where('bibliografiable_type', '=', Libro::class)->where('revisado', '=', 2)->count(),
+            'revision' => $bibliografias->where('bibliografiable_type', '=', Libro::class)->where('revisado', '=', 1)->count(),
             'vistas' => $this->getVistasLibros($bibliografias),
             'descargas' => $this->getDescargasLibros($bibliografias)    
         ]);
+
         $revistas = new Collection([
+            'cantidad' => $bibliografias->where('bibliografiable_type', '=', Revista::class)->count(),
+            'aceptado' => $bibliografias->where('bibliografiable_type', '=', Revista::class)->where('revisado', '=', 3)->count(),
+            'rechazado' => $bibliografias->where('bibliografiable_type', '=', Revista::class)->where('revisado', '=', 2)->count(),
+            'revision' => $bibliografias->where('bibliografiable_type', '=', Revista::class)->where('revisado', '=', 1)->count(),
             'vistas' => $this->getVistasRevistas($bibliografias),
             'descargas' => $this->getDescargasRevistas($bibliografias)    
         ]);
+
         $tesis = new Collection([
+            'cantidad' => $bibliografias->where('bibliografiable_type', '=', Tesis::class)->count(),
+            'aceptado' => $bibliografias->where('bibliografiable_type', '=', Tesis::class)->where('revisado', '=', 3)->count(),
+            'rechazado' => $bibliografias->where('bibliografiable_type', '=', Tesis::class)->where('revisado', '=', 2)->count(),
+            'revision' => $bibliografias->where('bibliografiable_type', '=', Tesis::class)->where('revisado', '=', 1)->count(),
             'vistas' => $this->getVistasTesis($bibliografias),
             'descargas' => $this->getDescargasTesis($bibliografias)    
         ]);

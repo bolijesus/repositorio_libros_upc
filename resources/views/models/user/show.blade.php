@@ -14,6 +14,9 @@
 
 @section('breadcrumbs')
     <li><a href="/">Inicio</a></li>
+    @if (Auth::user()->isAdmin())
+    <li><a href="{{ route('backoffice.user.index') }}">Usuarios</a></li>
+    @endif
         <li class="active">Usuario: {{ $user->usuario }}</li>
 @endsection
 
@@ -51,6 +54,9 @@
                         </li>
                     </ul>
                     <a href="{{ route('backoffice.user.edit',$user) }}" class="btn btn-upc btn-lg waves-effect btn-block">EDITAR PERFIL</a>
+                   @if (Auth::user()->isAdmin() && $user->verificado == false)
+                   <a href="{{ route('backoffice.activeUser',$user) }}" class="btn btn-upc btn-lg waves-effect btn-block">ACTIVAR USUARIO</a>
+                   @endif
                 </div>
             </div>
 

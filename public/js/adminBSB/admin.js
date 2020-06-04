@@ -221,6 +221,13 @@ $.AdminBSB.search = {
                 _this.hideSearchBar();
             }
         });
+
+        //Enter key on pressed
+        $searchBar.find('input[type="text"]').on('keyup', function (e) {
+            if (e.keyCode == 13) {
+                location.href = '/search?buscar='+this.value;
+            }
+        });
     },
     showSearchBar: function () {
         $searchBar.addClass('open');

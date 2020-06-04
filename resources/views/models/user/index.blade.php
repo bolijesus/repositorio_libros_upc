@@ -43,6 +43,7 @@
                         <thead>
                             <tr>
                                 <th>Usuario</th>
+                                <th>Verificado</th>
                                 <th>Nombre</th>
                                 <th>Apellido</th>
                                 <th>Email</th>
@@ -54,6 +55,7 @@
                         <tfoot>
                             <tr>
                                 <th>Usuario</th>
+                                <th>Verificado</th>
                                 <th>Nombre</th>
                                 <th>Apellido</th>
                                 <th>Email</th>
@@ -69,6 +71,9 @@
                                     <a href="{{ route('backoffice.user.show', $user) }}">
                                         {{ $user->usuario }}
                                     </a>
+                                </td>
+                                <td>
+                                    <i class="large material-icons {{ $user->verificado ?'col-green': 'col-red' }} ">{{ $user->verificado ?'check': 'close' }}</i>
                                 </td>
                                 <td>{{ $user->nombre }}</td>
                                 <td>{{ $user->apellido }}</td>

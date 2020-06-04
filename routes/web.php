@@ -44,11 +44,24 @@ Route::get('/', function () {
     return view('frontoffice.templates.index', compact('libros','revistas','tesis'));
 });
 
+Route::get('search',function ()
+{
+    if (request()->get('buscar')) {
+        $titulo = request()->get('buscar');
+        $bibliografias = Bibliografia::where('titulo','like','%'.$titulo.'%')->where('revisado',3)->get();
+        return view('frontoffice.templates.content_search',compact('bibliografias'));
+    }
+
+    return response(view('errors.404'),404);
+});
+
 //BACK OFFICE
-Route::name('backoffice.')->middleware('auth')->group(function (){
+Route::name('backoffice.')->middleware(['auth','userVerified'])->group(function (){
 
     Route::resource('/role', 'RoleController');
     Route::resource('/user', 'UserController');
+    Route::get('/activate/{user}','UserController@activeUser')->name('activeUser');
+
     Route::resource('/autor', 'AutorController');
     Route::resource('/genero', 'GeneroController');
     Route::get('/index','ReporteController@reportes')->name('index');
@@ -67,6 +80,6 @@ Route::name('backoffice.')->middleware('auth')->group(function (){
     
     Route::post('/puntos', 'LibroController@puntosActuales');
 });
-Auth::routes(['register' => false]);
+Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');

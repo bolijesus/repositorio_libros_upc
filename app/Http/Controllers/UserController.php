@@ -13,6 +13,7 @@ use App\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
@@ -185,4 +186,15 @@ class UserController extends Controller
 
         return $request;
     }    
+
+    public function activeUser(User $user)
+    {
+        Gate::authorize('viewAny',Auth::user());
+        $user->update(['verificado'=> true]);
+        return \back()->with('alert',\swal("
+            'Activado!',
+            'el Usuario ".$user->usuario." se activo en el sistema con exito!',
+            'success'
+        "));
+    }
 }

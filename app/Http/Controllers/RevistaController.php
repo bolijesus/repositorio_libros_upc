@@ -75,6 +75,7 @@ class RevistaController extends Controller
                 $bibliografia = $revista->bibliografia()->create($bibliografia);
                 $bibliografia->autores()->sync($autores);
                 $bibliografia->generos()->sync($generos);
+                \notificarAdministradores($revista,'Se ha subido una nueva revista.');
             },5);
         } catch (\Throwable $th) {
             dd($th);
@@ -127,6 +128,7 @@ class RevistaController extends Controller
         FacadesGate::authorize('editar-revistas', $revista);
         $autores = Autor::all();
         $generos = Genero::all();
+        
         return \view('models.revista.edit',\compact('autores','revista','generos') );
     }
 
@@ -152,15 +154,20 @@ class RevistaController extends Controller
         try {
             DB::transaction(function () use ($request, $revista, $autores, $generos)
             {
+                $enRevision=1;
+                $noAceptado=2;
                 if (request()->has('_archivo')) {
                     Storage::delete($revista->bibliografia->archivo);               
                     $request = $this->updateFile($request, $revista);
                 }  
 
-                if ( !Auth::user()->isAdmin() && $revista->bibliografia->revisado != 1 ) {
-                    $request = Arr::add($request,'revisado',1);
+                if ( !Auth::user()->isAdmin() && $revista->bibliografia->revisado != $enRevision ) {
+                    $request = Arr::add($request,'revisado',$enRevision);
                 }
-                  
+
+                if ($revista->bibliografia->revisado == $noAceptado ) {
+                    \notificarAdministradores($revista,'Revista actualizada para revision','update','bg-orange');
+                } 
                 $revista->bibliografia->update($request->except(['publicador']));                    
                 $revista->update($request->only(['publicador']));
                 $revista->bibliografia->autores()->sync($autores);
@@ -328,11 +335,14 @@ class RevistaController extends Controller
                     'contenido' => $mensajeRevision
                 ]);
             }
+
+            \notificarUsuarios($revista,'Revista no aceptada','close','bg-red');
+
         }elseif ($revision == $revisado) {
             $bibliografia->revisado = $revisado;
             \asignarPuntos($revista->bibliografia);
             $mensaje = "'Archivo aceptado', 'El archivo se acepto en la plataforma', 'success'";
-            
+            \notificarUsuarios($revista,'Revista aceptada en el sistema','check','bg-green');
         } else {
             $bibliografia->revisado = $enRevison;
         }

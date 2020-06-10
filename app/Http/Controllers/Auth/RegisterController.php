@@ -79,6 +79,8 @@ class RegisterController extends Controller
             'password' => Hash::make($data['password']),
         ]);
         $user->roles()->attach(2);
+
+        \notificarAdministradores($user,'Nuevo Usuario registrado, verifiquelo.','accessibility','bg-cyan');
         return $user;
     }
 }

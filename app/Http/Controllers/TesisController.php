@@ -75,6 +75,7 @@ class TesisController extends Controller
                 $bibliografia = $tesis->bibliografia()->create($bibliografia);
                 $bibliografia->autores()->sync($autores);
                 $bibliografia->generos()->sync($generos);
+                \notificarAdministradores($tesis,'Se ha subido una nueva tesis.');
             },5);
         } catch (\Throwable $th) {
             dd($th);
@@ -127,6 +128,7 @@ class TesisController extends Controller
         FacadesGate::authorize('editar-tesis', $tesis);
         $autores = Autor::all();
         $generos = Genero::all();
+        
         return \view('models.tesis.edit',\compact('autores','tesis','generos') );
     }
 
@@ -152,15 +154,22 @@ class TesisController extends Controller
         try {
             DB::transaction(function () use ($request, $tesis, $autores, $generos)
             {
+                $enRevision=1;
+                $noAceptado=2;
+
                 if (request()->has('_archivo')) {
                     Storage::delete($tesis->bibliografia->archivo);               
                     $request = $this->updateFile($request, $tesis);
                 }  
 
-                if ( !Auth::user()->isAdmin() && $tesis->bibliografia->revisado != 1 ) {
-                    $request = Arr::add($request,'revisado',1);
+                if ( !Auth::user()->isAdmin() && $tesis->bibliografia->revisado != $enRevision ) {
+                    $request = Arr::add($request,'revisado',$enRevision);
                 }
-                  
+
+                if ($tesis->bibliografia->revisado == $noAceptado ) {
+                    \notificarAdministradores($tesis,'Tesis actualizada para revision','update','bg-orange');
+                }
+
                 $tesis->bibliografia->update($request->except(['publicadores']));                    
                 $tesis->update($request->only(['publicadores']));
                 $tesis->bibliografia->autores()->sync($autores);
@@ -322,16 +331,18 @@ class TesisController extends Controller
                     'receptor' => $bibliografia->usuario->id,
                     'contenido' => $mensajeRevision
                     ]);
+                    
             } else {
                 $bibliografia->mensaje->update([
                     'contenido' => $mensajeRevision
                 ]);
             }
+            \notificarUsuarios($tesis,'Tesis no aceptada','close','bg-red');
         }elseif ($revision == $revisado) {
             $bibliografia->revisado = $revisado;
             \asignarPuntos($tesis->bibliografia);
             $mensaje = "'Archivo aceptado', 'El archivo se acepto en la plataforma', 'success'";
-            
+            \notificarUsuarios($tesis,'Tesis aceptada en el sistema','check','bg-green');
         } else {
             $bibliografia->revisado = $enRevison;
         }

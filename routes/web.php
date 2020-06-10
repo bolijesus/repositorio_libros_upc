@@ -24,7 +24,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 Route::get('test', function(){
-   ddd(User::all());
+    $admins = Role::where('id','1')->first()->usuarios;
+    dd($admins);
+    foreach ($admins->usuarios as $admin) {
+        dd($admin);
+    }
 });
 
 // DB::listen(function($query){
@@ -61,6 +65,8 @@ Route::name('backoffice.')->middleware(['auth','userVerified'])->group(function 
     Route::resource('/role', 'RoleController');
     Route::resource('/user', 'UserController');
     Route::get('/activate/{user}','UserController@activeUser')->name('activeUser');
+
+    Route::post('/notificacion','NotificationController@read')->name('notification.read');
 
     Route::resource('/autor', 'AutorController');
     Route::resource('/genero', 'GeneroController');

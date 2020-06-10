@@ -6,10 +6,12 @@ use App\Bibliografia;
 use App\Http\Requests\User\StoreRequest;
 use App\Http\Requests\User\UpdateRequest;
 use App\Libro;
+use App\Notifications\MessageSetn;
 use App\Revista;
 use App\Role;
 use App\Tesis;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -189,12 +191,23 @@ class UserController extends Controller
 
     public function activeUser(User $user)
     {
+        
         Gate::authorize('viewAny',Auth::user());
+        $mensaje = [
+            'icon' => 'done_all',
+            'color'=> 'bg-light-green',
+            'mensaje'=>'Has sido aceptado en el sistema',
+            'route'=> \route('backoffice.user.show',$user),
+            'time' => Carbon::now()
+        ];
         $user->update(['verificado'=> true]);
+        $user->notify(new MessageSetn($mensaje));
+        
         return \back()->with('alert',\swal("
             'Activado!',
             'el Usuario ".$user->usuario." se activo en el sistema con exito!',
             'success'
         "));
+
     }
 }

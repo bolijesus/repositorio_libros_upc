@@ -7,8 +7,12 @@ use App\Genero;
 use App\Http\Requests\Libro\StoreRequest;
 use App\Http\Requests\Libro\UpdateRequest;
 use App\Libro;
+use App\Notifications\MessageSetn;
+use App\Role;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -59,11 +63,11 @@ class LibroController extends Controller
      */
     public function store(StoreRequest $request)
     {   
+        
         $libro=$request->only(['editorial', 'isbn']);                
         $bibliografia = $this->storeFile($request);
         $autores = $request->autores;
         $generos = $request->generos;
-        
         try {
             DB::transaction(function()use($bibliografia, $libro, $autores, $generos){
                 $libro = Libro::create($libro);
@@ -73,7 +77,11 @@ class LibroController extends Controller
                 $bibliografia = $libro->bibliografia()->create($bibliografia);
                 $bibliografia->autores()->sync($autores);
                 $bibliografia->generos()->sync($generos);
+
+                \notificarAdministradores($libro,'Se ha subido un nuevo libro.');
+                
             },5);
+            
         } catch (\Throwable $th) {
             dd($th);
             return \redirect()->route('backoffice.libro.index')->with('alert',swal(
@@ -127,6 +135,9 @@ class LibroController extends Controller
         FacadesGate::authorize('editar-libros', $libro);
         $autores = Autor::all();
         $generos = Genero::all();
+
+        
+
         return \view('models.libro.edit',\compact('autores','libro','generos') );
     }
 
@@ -152,13 +163,19 @@ class LibroController extends Controller
         try {
             DB::transaction(function () use ($request, $libro, $autores, $generos)
             {
+                $enRevision=1;
+                $noAceptado=2;
                 if (request()->has('_archivo')) {
                     Storage::delete($libro->bibliografia->archivo);               
                     $request = $this->updateFile($request, $libro);
                 }  
 
-                if ( !Auth::user()->isAdmin() && $libro->bibliografia->revisado != 1 ) {
-                    $request = Arr::add($request,'revisado',1);
+                if ( !Auth::user()->isAdmin() && $libro->bibliografia->revisado != $enRevision ) {
+                    $request = Arr::add($request,'revisado',$enRevision);
+                }
+
+                if ($libro->bibliografia->revisado == $noAceptado ) {
+                    \notificarAdministradores($libro,'Libro actualizado para revision','update','bg-orange');
                 }
                   
                 $libro->bibliografia->update($request->except(['editorial','isbn']));                    
@@ -327,11 +344,12 @@ class LibroController extends Controller
                     'contenido' => $mensajeRevision
                 ]);
             }
+            \notificarUsuarios($libro,'Libro no aceptado','close','bg-red');
         }elseif ($revision == $revisado) {
             $bibliografia->revisado = $revisado;
             \asignarPuntos($libro->bibliografia);
             $mensaje = "'Archivo aceptado', 'El archivo se acepto en la plataforma', 'success'";
-            
+            \notificarUsuarios($libro,'Libro aceptado en el sistema','check','bg-green');
         } else {
             $bibliografia->revisado = $enRevison;
         }

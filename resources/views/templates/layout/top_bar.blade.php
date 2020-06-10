@@ -11,6 +11,46 @@
                 <!-- Call Search -->
                 <li><a href="javascript:void(0);" class="js-search" data-close="true"><i class="material-icons">search</i></a></li>
                 <!-- #END# Call Search -->
+                @auth
+                <!-- Notifications -->
+                @if ($count = Auth::user()->UnreadNotifications->count())
+                
+                
+                <li class="dropdown">
+                    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                        <i class="material-icons">notifications</i>
+                        <span class="label-count">{{ $count }}</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="header">NOTIFICAIONES</li>
+                        <li class="body">
+                            <ul class="menu">
+                                @csrf
+                                @foreach (Auth::user()->notifications as $notification)
+                                    @if ($notification->unread())
+                                        <li data-id_notification="{{ $notification->id }}" class="notificacion-upc">
+                                            <a href="{{ $notification->data['route'] }}">
+                                                <div class="icon-circle {{ $notification->data['color'] }}">
+                                                    <i class="material-icons">{{ $notification->data['icon'] }}</i>
+                                                </div>
+                                                <div class="menu-info">
+                                                    <h4>{{ $notification->data['mensaje'] }}</h4>
+                                                    <p>
+                                                        <i class="material-icons">access_time</i> {{ creadaHace($notification->data['time']) }}
+                                                    </p>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    @endif
+                                @endforeach
+                                
+                            </ul>
+                        </li>
+                    </ul>
+                </li>                    
+                @endif
+                <!-- #END# Notifications -->                    
+                @endauth
                 <li class="dropdown">
                     <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button">
                         <i class="material-icons">more_vert</i>

@@ -15,4 +15,18 @@ $(document).ready(function () {
 
         
     });
+
+    $('.notificacion-upc').on('click', function () {
+        let token = $('input[name=_token]').val();
+        let id_notificacion = this.dataset.id_notification;
+        
+        $.ajax({
+            type: "POST",
+            url: "/notificacion",
+            data: {"_token": token, "id_notificacion": id_notificacion},
+            success: function (response) {
+                
+            }
+        });    
+    });
 });

@@ -20,7 +20,6 @@ class CreateMensajesTable extends Migration
             $table->unsignedBigInteger('receptor');
 
             $table->unsignedBigInteger('bibliografia_id');
-            $table->unsignedBigInteger('bibliografia_id');
             $table->foreign('bibliografia_id')->references('id')->on('bibliografias')->onDelete('CASCADE');
  
 

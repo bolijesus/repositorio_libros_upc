@@ -1,9 +1,4 @@
-window.onload=function(){
-     $(function(){
-         if(window.location.protocol==="https:")
-             window.location.protocol="http";
-     });
- }
+
 $(document).ready(function () {
     
     $('.descargar-ajax').on('click', function () {

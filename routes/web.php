@@ -41,12 +41,16 @@ Route::get('/demo',function ()
 });
 
 Route::get('/', function () {
+    return redirect()->route('index_front');
+});
+
+Route::get('/inicio', function () {
     $libros = Libro::all()->load(['bibliografia', 'bibliografia.usuario']);
     $revistas = Revista::all()->load(['bibliografia', 'bibliografia.usuario']);
     $tesis = Tesis::all()->load(['bibliografia', 'bibliografia.usuario']);
     
     return view('frontoffice.templates.index', compact('libros','revistas','tesis'));
-});
+})->name('index_front');
 
 Route::get('search',function ()
 {
